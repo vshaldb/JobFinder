@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{PAGE_TITLE}}</title>
+  <script src="applied_jobs.js"></script>
+  <style>
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-surface: #ffffff;
+      --border-color: #e2e8f0;
+      --border-hover: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-subtle: #eff6ff;
+      --accent-workday: #0284c7;
+      --accent-eightfold: #6366f1;
+      --accent-greenhouse: #10b981;
+      --accent-icims: #f59e0b;
+      --accent-rippling: #be185d;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .title-group h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-group p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .stat-badge {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      text-align: center;
+      min-width: 110px;
+    }
+
+    .stat-badge .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-badge .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .filters-summary {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-color);
+      font-size: 13px;
+    }
+
+    .filter-label {
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-right: 4px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary-subtle);
+      color: var(--primary);
+      border: 1px solid #bfdbfe;
+      border-radius: 9999px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .chip strong {
+      color: #1e40af;
+    }
+
+    /* Filter Controls Bar */
+    .controls-bar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 18px 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-end;
+    }
+
+    .control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1 1 240px;
+      position: relative;
+    }
+
+    .control-item.compact {
+      flex: 0 0 auto;
+    }
+
+    .control-item label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper input,
+    .input-wrapper select {
+      width: 100%;
+      height: 42px;
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: #ffffff;
+      color: var(--text-main);
+      transition: all 0.15s ease-in-out;
+      outline: none;
+    }
+
+    .input-wrapper input:focus,
+    .input-wrapper select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .input-wrapper select {
+      cursor: pointer;
+      padding-right: 32px;
+      background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="%2364748b" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    /* Multi-select Dropdown for Location */
+    .multiselect-dropdown {
+      position: relative;
+      width: 100%;
+    }
+
+    .multiselect-trigger {
+      width: 100%;
+      height: 42px;
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: #ffffff;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      transition: all 0.15s ease-in-out;
+      outline: none;
+      text-align: left;
+    }
+
+    .multiselect-trigger:hover {
+      border-color: var(--border-hover);
+    }
+
+    .multiselect-trigger:focus,
+    .multiselect-trigger.is-active {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .trigger-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .trigger-chevron {
+      color: var(--text-muted);
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .multiselect-trigger.is-active .trigger-chevron {
+      transform: rotate(180deg);
+    }
+
+    .multiselect-menu {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      z-index: 50;
+      padding: 10px;
+      max-height: 340px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .multiselect-header {
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .multiselect-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .btn-micro {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.1s ease;
+    }
+
+    .btn-micro:hover {
+      background: #e2e8f0;
+      color: var(--text-main);
+    }
+
+    .multiselect-search {
+      width: 100%;
+      height: 32px;
+      padding: 4px 8px;
+      font-size: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      outline: none;
+    }
+
+    .multiselect-search:focus {
+      border-color: var(--primary);
+    }
+
+    .multiselect-options {
+      overflow-y: auto;
+      max-height: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .multiselect-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.1s ease;
+    }
+
+    .multiselect-option:hover {
+      background: var(--bg-primary);
+    }
+
+    .multiselect-option input[type="checkbox"] {
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+
+    .multiselect-option .option-label {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .multiselect-option .option-count {
+      font-size: 11px;
+      color: var(--text-muted);
+      background: #f1f5f9;
+      padding: 1px 6px;
+      border-radius: 9999px;
+    }
+
+    /* Reset button */
+    .btn-reset {
+      height: 42px;
+      padding: 0 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn-reset:hover {
+      color: var(--text-main);
+      border-color: var(--border-hover);
+      background: #e2e8f0;
+    }
+
+    .results-counter {
+      align-self: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding: 4px 8px;
+    }
+
+    .results-counter strong {
+      color: var(--text-main);
+    }
+
+    /* Master Action Bar */
+    .table-actions-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 0 4px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .actions-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-toggle-all,
+    .btn-merge-all {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-toggle-all:hover,
+    .btn-merge-all:hover {
+      background: var(--bg-primary);
+      border-color: var(--border-hover);
+    }
+
+    .btn-merge-all.is-merged-active {
+      background: var(--primary-subtle);
+      border-color: #93c5fd;
+      color: var(--primary);
+    }
+
+    .chevron-all {
+      transition: transform 0.2s ease;
+    }
+
+    .btn-toggle-all.is-collapsed-all .chevron-all {
+      transform: rotate(-90deg);
+    }
+
+    .merge-status-pill {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+
+    .merged-header {
+      cursor: default !important;
+      background: #f8fafc;
+    }
+
+    .col-company {
+      min-width: 170px;
+      white-space: nowrap;
+    }
+
+    .company-cell-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .company-cell-wrapper .company-name-text {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Company Sections */
+    .company-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .company-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .company-header {
+      padding: 16px 20px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s ease;
+    }
+
+    .company-header:hover {
+      background: #f8fafc;
+    }
+
+    .company-card.is-collapsed .company-header {
+      border-bottom: none;
+    }
+
+    .company-title-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Dropdown Toggle Button to the left of company name */
+    .company-collapse-btn {
+      background: #f1f5f9;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .company-collapse-btn:hover {
+      background: #e2e8f0;
+      color: var(--primary);
+    }
+
+    .chevron-icon {
+      transition: transform 0.2s ease;
+    }
+
+    .company-card.is-collapsed .chevron-icon {
+      transform: rotate(-90deg);
+    }
+
+    .company-card.is-collapsed .company-body {
+      display: none !important;
+    }
+
+    .company-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-ats-workday {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+
+    .badge-ats-eightfold {
+      background: #e0e7ff;
+      color: #4338ca;
+      border: 1px solid #c7d2fe;
+    }
+
+    .badge-ats-greenhouse {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .badge-ats-icims {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .badge-ats-rippling {
+      background: #fdf2f8;
+      color: #be185d;
+      border: 1px solid #fbcfe8;
+    }
+
+    .badge-ats-ashby {
+      background: #eef2ff;
+      color: #4f46e5;
+      border: 1px solid #c7d2fe;
+    }
+
+    .badge-ats-lever {
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+    }
+
+    .badge-ats-default {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+    }
+
+    .badge-count {
+      background: #f8fafc;
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      font-weight: 600;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+    }
+
+    /* Table */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    /* Column Header with Sort Button */
+    .th-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-sort {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      padding: 3px 5px;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .btn-sort:hover {
+      background: #e2e8f0;
+      color: var(--text-main);
+    }
+
+    .btn-sort.sort-asc,
+    .btn-sort.sort-desc {
+      background: var(--primary-subtle);
+      border-color: #bfdbfe;
+      color: var(--primary);
+    }
+
+    .btn-sort .icon-asc,
+    .btn-sort .icon-desc {
+      display: none;
+    }
+
+    .btn-sort.sort-asc .icon-unsorted { display: none; }
+    .btn-sort.sort-asc .icon-asc { display: inline-block; }
+
+    .btn-sort.sort-desc .icon-unsorted { display: none; }
+    .btn-sort.sort-desc .icon-desc { display: inline-block; }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    tr.job-row:last-child td {
+      border-bottom: none;
+    }
+
+    tr.job-row:hover {
+      background-color: #f8fafc;
+    }
+
+    .col-sno {
+      font-weight: 600;
+      color: var(--text-muted);
+      width: 60px;
+      text-align: center;
+    }
+
+    .col-title {
+      font-weight: 600;
+      min-width: 280px;
+    }
+
+    .role-name {
+      color: var(--text-main);
+    }
+
+    .highlight {
+      background-color: #fef08a;
+      padding: 1px 2px;
+      border-radius: 2px;
+    }
+
+    .col-jobid {
+      white-space: nowrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .col-jobid code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .col-location {
+      color: var(--text-muted);
+      font-size: 13px;
+      min-width: 170px;
+    }
+
+    .col-posted {
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
+    .posted-date {
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    .posted-relative {
+      color: var(--text-light);
+      font-size: 12px;
+      margin-left: 4px;
+    }
+
+    .col-apply {
+      text-align: center;
+      width: 155px;
+      white-space: nowrap;
+    }
+
+    .apply-action-group {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-apply {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: var(--primary);
+      color: #ffffff;
+      text-decoration: none;
+      padding: 6px 13px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.15s ease-in-out, transform 0.1s ease;
+    }
+
+    .btn-apply:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .badge-applied {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      user-select: none;
+    }
+
+    .btn-toggle-apply {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      padding: 5px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+
+    .btn-mark-apply:hover {
+      border-color: #10b981;
+      color: #059669;
+      background: #ecfdf5;
+    }
+
+    .btn-unmark-apply {
+      border-color: transparent;
+      background: transparent;
+      color: var(--text-light);
+      padding: 4px 6px;
+    }
+
+    .btn-unmark-apply:hover {
+      color: #ef4444;
+      background: #fee2e2;
+      border-color: #fca5a5;
+    }
+
+    .stat-badge.stat-applied .stat-value {
+      color: #059669;
+    }
+
+    .btn-toggle-applied {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 7px 14px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-toggle-applied:hover {
+      background: #f1f5f9;
+      border-color: var(--border-hover);
+    }
+
+    .btn-toggle-applied.is-active {
+      background: #f0fdf4;
+      border-color: #86efac;
+      color: #166534;
+    }
+
+    tr.job-row.row-applied {
+      background-color: #fbfdfc;
+    }
+
+    /* Toast Notification */
+    #jobfinder-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+    }
+
+    #jobfinder-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Empty states */
+    .empty-state {
+      padding: 36px 16px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .global-empty-card {
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .global-empty-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 24px 0 12px 0;
+      color: var(--text-light);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="header-top">
+        <div class="title-group">
+          <h1>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            {{PAGE_TITLE}}
+          </h1>
+          <p>Generated on {{RUN_TIMESTAMP}}</p>
+        </div>
+        <div class="header-stats">
+          <div class="stat-badge">
+            <div class="stat-value" id="stat-total-companies">{{TOTAL_COMPANIES}}</div>
+            <div class="stat-label">Companies</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-value" id="stat-total-jobs">{{TOTAL_JOBS}}</div>
+            <div class="stat-label">Jobs Fetched</div>
+          </div>
+          <div class="stat-badge stat-applied" id="stat-badge-applied" title="Jobs in this search marked as applied">
+            <div class="stat-value" id="stat-applied-count">{{APPLIED_JOBS_COUNT}}</div>
+            <div class="stat-label">Applied</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filters-summary">
+        <span class="filter-label">Run Filters:</span>
+        {{FILTER_CHIPS}}
+      </div>
+    </header>
+
+    <!-- Filter & Dropdown Controls Bar -->
+    <div class="controls-bar">
+      <!-- 1. Company Select Dropdown -->
+      <div class="control-item">
+        <label for="company-select">Select Company Table</label>
+        <div class="input-wrapper">
+          <select id="company-select">
+            {{COMPANY_OPTIONS}}
+          </select>
+        </div>
+      </div>
+
+      <!-- 2. Location Multi-Select Dropdown -->
+      <div class="control-item">
+        <label for="location-trigger">Filter by Location(s)</label>
+        <div class="multiselect-dropdown" id="location-multiselect">
+          <button type="button" class="multiselect-trigger" id="location-trigger" aria-haspopup="true" aria-expanded="false">
+            <span class="trigger-label" id="location-selected-label">All Locations</span>
+            <svg class="trigger-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="multiselect-menu" id="location-menu" style="display: none;">
+            <div class="multiselect-header">
+              <div class="multiselect-actions">
+                <button type="button" class="btn-micro" id="btn-loc-select-all">Select All</button>
+                <button type="button" class="btn-micro" id="btn-loc-clear-all">Clear All</button>
+              </div>
+              <input type="text" class="multiselect-search" id="loc-search" placeholder="Search locations..." autocomplete="off">
+            </div>
+            <div class="multiselect-options" id="loc-options-list">
+              {{LOCATION_OPTIONS}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Filter Role Name Input -->
+      <div class="control-item" style="flex: 1.5 1 300px;">
+        <label for="role-filter">Filter by Role Name</label>
+        <div class="input-wrapper">
+          <input
+            type="text"
+            id="role-filter"
+            placeholder="Search role name (e.g. EDA, CAD, Physical Design, Verification)..."
+            autocomplete="off"
+          >
+        </div>
+      </div>
+
+      <!-- 4. Reset & Stats -->
+      <div class="control-item compact" style="display: flex; flex-direction: row; align-items: flex-end; gap: 12px;">
+        <button id="btn-reset" class="btn-reset" type="button" title="Reset all filters">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+          </svg>
+          Reset
+        </button>
+        <div class="results-counter" id="visible-counter">
+          Showing <strong>{{TOTAL_JOBS}}</strong> of {{TOTAL_JOBS}} jobs
+        </div>
+      </div>
+    </div>
+
+    <!-- Master Action Bar: Single toggle to close/display all companies at once, and Merge toggle -->
+    <div class="table-actions-bar">
+      <div class="actions-group">
+        <button type="button" id="btn-toggle-all" class="btn-toggle-all" title="Expand or collapse all company tables at once">
+          <svg class="chevron-all" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+          <span id="toggle-all-label">Collapse All Tables</span>
+        </button>
+        <button type="button" id="btn-merge-all" class="btn-merge-all" title="Merge all company tables into a unified view to sort and view all jobs together">
+          <svg class="merge-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="9" y1="21" x2="9" y2="9"></line>
+          </svg>
+          <span id="merge-all-label">Merge All Tables</span>
+        </button>
+        <button type="button" id="btn-toggle-applied" class="btn-toggle-applied" aria-pressed="false" title="Toggle hiding already applied jobs from view">
+          <svg class="applied-filter-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span id="toggle-applied-label">Hide Applied</span>
+        </button>
+      </div>
+      <div id="merge-status-pill" class="merge-status-pill" style="display: none;">
+        <span>Unified Table Active</span>
+      </div>
+    </div>
+
+    <!-- Company Sections & Tables (Split View) -->
+    <main id="companies-container">
+      {{COMPANY_SECTIONS}}
+    </main>
+
+    <!-- Unified Merged Table (Merged View) -->
+    <div id="merged-container" style="display: none;">
+      {{MERGED_SECTION}}
+    </div>
+
+    <!-- Global Empty State -->
+    <div id="global-empty-state" class="global-empty-card" style="display: none;">
+      <h3>No matching jobs found</h3>
+      <p>Try adjusting your location or role name filter query.</p>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      JobFinder CLI &middot; Automated Career Opportunities Report &middot; {{TOTAL_COMPANIES}} companies &middot; {{TOTAL_JOBS}} jobs
+    </footer>
+  </div>
+
+  <script>
+    (function() {
+      // Elements
+      const companySelect = document.getElementById('company-select');
+      const roleFilter = document.getElementById('role-filter');
+      const btnReset = document.getElementById('btn-reset');
+      const visibleCounter = document.getElementById('visible-counter');
+      const globalEmptyState = document.getElementById('global-empty-state');
+      const companyCards = Array.from(document.querySelectorAll('#companies-container .company-card'));
+      const btnToggleAll = document.getElementById('btn-toggle-all');
+      const toggleAllLabel = document.getElementById('toggle-all-label');
+
+      // Merged View Elements
+      let isMerged = false;
+      const btnMergeAll = document.getElementById('btn-merge-all');
+      const mergeAllLabel = document.getElementById('merge-all-label');
+      const companiesContainer = document.getElementById('companies-container');
+      const mergedContainer = document.getElementById('merged-container');
+      const mergedTableCard = document.getElementById('merged-table-card');
+      const mergeStatusPill = document.getElementById('merge-status-pill');
+
+      // Location Multi-select elements
+      const locTrigger = document.getElementById('location-trigger');
+      const locMenu = document.getElementById('location-menu');
+      const locSelectedLabel = document.getElementById('location-selected-label');
+      const locSearch = document.getElementById('loc-search');
+      const btnLocSelectAll = document.getElementById('btn-loc-select-all');
+      const btnLocClearAll = document.getElementById('btn-loc-clear-all');
+      const locCheckboxes = Array.from(document.querySelectorAll('.loc-checkbox'));
+      const locOptionLabels = Array.from(document.querySelectorAll('.multiselect-option'));
+
+      const totalInitialJobs = parseInt("{{TOTAL_JOBS}}", 10) || 0;
+
+      // ── Applied Jobs Tracker State & Helpers ──────────────────────────────
+      let hideApplied = false;
+      const btnToggleApplied = document.getElementById('btn-toggle-applied');
+      const toggleAppliedLabel = document.getElementById('toggle-applied-label');
+      const statAppliedCount = document.getElementById('stat-applied-count');
+      const toastEl = document.getElementById('jobfinder-toast');
+
+      let toastTimeout = null;
+      function showToast(message, type = 'info') {
+        if (!toastEl) return;
+        toastEl.textContent = message;
+        toastEl.className = 'show ' + type;
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          toastEl.className = '';
+        }, 3200);
+      }
+
+      const appliedJobsMap = new Map();
+
+      function normalizeKey(company, jobId) {
+        return (company || '').trim().toLowerCase() + ':::' + String(jobId || '').trim().toLowerCase();
+      }
+
+      function loadInitialAppliedJobs() {
+        // 1. From embedded JSON
+        try {
+          const embeddedEl = document.getElementById('applied-jobs-data');
+          if (embeddedEl && embeddedEl.textContent.trim()) {
+            const list = JSON.parse(embeddedEl.textContent.trim());
+            if (Array.isArray(list)) {
+              list.forEach(item => {
+                const k = normalizeKey(item.company, item.job_id);
+                appliedJobsMap.set(k, item);
+                if (item.job_id_full) {
+                  appliedJobsMap.set(normalizeKey(item.company, item.job_id_full), item);
+                }
+              });
+            }
+          }
+        } catch (e) {}
+
+        // 2. From window.APPLIED_JOBS (applied_jobs.js)
+        if (window.APPLIED_JOBS && Array.isArray(window.APPLIED_JOBS)) {
+          window.APPLIED_JOBS.forEach(item => {
+            const k = normalizeKey(item.company, item.job_id);
+            appliedJobsMap.set(k, item);
+            if (item.job_id_full) {
+              appliedJobsMap.set(normalizeKey(item.company, item.job_id_full), item);
+            }
+          });
+        }
+
+        // 3. From localStorage cache
+        try {
+          const cached = JSON.parse(localStorage.getItem('jobfinder_applied_jobs') || '[]');
+          if (Array.isArray(cached)) {
+            cached.forEach(item => {
+              const k = normalizeKey(item.company, item.job_id);
+              if (!appliedJobsMap.has(k)) {
+                appliedJobsMap.set(k, item);
+              }
+            });
+          }
+        } catch (e) {}
+      }
+
+      loadInitialAppliedJobs();
+
+      function renderAppliedCell(group, isApplied) {
+        const company = group.getAttribute('data-company') || '';
+        const jobId = group.getAttribute('data-jobid') || '';
+        const jobIdFull = group.getAttribute('data-jobid-full') || '';
+        const role = group.getAttribute('data-role') || '';
+        const url = group.getAttribute('data-url') || '';
+
+        if (isApplied) {
+          group.className = 'apply-action-group is-applied';
+          group.innerHTML = `
+            <span class="badge-applied" title="Marked as applied in applied_jobs.json">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Applied
+            </span>
+            <button type="button" class="btn-toggle-apply btn-unmark-apply" title="Click to unmark applied status" aria-label="Unmark applied">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          `;
+        } else {
+          group.className = 'apply-action-group not-applied';
+          const applyBtnHtml = (url && url !== '#')
+            ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="btn-apply" title="Apply for ${escapeHtml(role)}">Apply ↗</a>`
+            : `<span class="text-muted">N/A</span>`;
+          group.innerHTML = `
+            ${applyBtnHtml}
+            <button type="button" class="btn-toggle-apply btn-mark-apply" title="Mark this role as applied in applied_jobs.json" aria-label="Mark applied">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span class="btn-mark-text">Mark</span>
+            </button>
+          `;
+        }
+      }
+
+      function updateAllRowsMatching(company, jobId, jobIdFull, isApplied) {
+        const targetKey = normalizeKey(company, jobId);
+        const targetFullKey = jobIdFull ? normalizeKey(company, jobIdFull) : null;
+
+        const allGroups = document.querySelectorAll('.apply-action-group');
+        allGroups.forEach(group => {
+          const c = group.getAttribute('data-company') || '';
+          const jid = group.getAttribute('data-jobid') || '';
+          const jidF = group.getAttribute('data-jobid-full') || '';
+          const k1 = normalizeKey(c, jid);
+          const k2 = jidF ? normalizeKey(c, jidF) : null;
+
+          if (k1 === targetKey || (targetFullKey && k1 === targetFullKey) || (k2 && k2 === targetKey)) {
+            renderAppliedCell(group, isApplied);
+            const tr = group.closest('tr.job-row');
+            if (tr) {
+              tr.setAttribute('data-applied', isApplied ? 'true' : 'false');
+              tr.classList.toggle('row-applied', isApplied);
+            }
+          }
+        });
+      }
+
+      function updateAppliedCountDisplay() {
+        if (!statAppliedCount) return;
+        let count = 0;
+        const seenKeys = new Set();
+        document.querySelectorAll('#companies-container tr.job-row').forEach(row => {
+          if (row.getAttribute('data-applied') === 'true') {
+            const group = row.querySelector('.apply-action-group');
+            if (group) {
+              const k = normalizeKey(group.getAttribute('data-company'), group.getAttribute('data-jobid'));
+              if (!seenKeys.has(k)) {
+                seenKeys.add(k);
+                count++;
+              }
+            }
+          }
+        });
+        statAppliedCount.textContent = String(count);
+      }
+
+      async function syncAppliedJobsFromServer() {
+        const endpoints = ['/api/applied', 'http://127.0.0.1:8000/api/applied'];
+        for (const ep of endpoints) {
+          try {
+            const resp = await fetch(ep + '?t=' + Date.now(), { cache: 'no-store' });
+            if (resp.ok) {
+              const data = await resp.json();
+              if (data && Array.isArray(data.applied_jobs)) {
+                appliedJobsMap.clear();
+                data.applied_jobs.forEach(item => {
+                  const k = normalizeKey(item.company, item.job_id);
+                  appliedJobsMap.set(k, item);
+                  if (item.job_id_full) {
+                    appliedJobsMap.set(normalizeKey(item.company, item.job_id_full), item);
+                  }
+                });
+                try {
+                  localStorage.setItem('jobfinder_applied_jobs', JSON.stringify(data.applied_jobs));
+                } catch (e) {}
+
+                document.querySelectorAll('.apply-action-group').forEach(group => {
+                  const comp = group.getAttribute('data-company') || '';
+                  const jid = group.getAttribute('data-jobid') || '';
+                  const jidF = group.getAttribute('data-jobid-full') || '';
+                  const k1 = normalizeKey(comp, jid);
+                  const k2 = jidF ? normalizeKey(comp, jidF) : null;
+                  const isApp = appliedJobsMap.has(k1) || (k2 && appliedJobsMap.has(k2));
+                  renderAppliedCell(group, isApp);
+                  const tr = group.closest('tr.job-row');
+                  if (tr) {
+                    tr.setAttribute('data-applied', isApp ? 'true' : 'false');
+                    tr.classList.toggle('row-applied', isApp);
+                  }
+                });
+                updateAppliedCountDisplay();
+                applyFilters();
+                return true;
+              }
+            }
+          } catch (e) {}
+        }
+        return false;
+      }
+
+      // ── Safe Text Highlight Helper ─────────────────────────────────────────
+      function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function highlightText(element, originalText, query) {
+        if (!query) {
+          element.textContent = originalText;
+          return;
+        }
+        const safeOriginal = escapeHtml(originalText);
+        const safeQuery = escapeHtml(query);
+        const regex = new RegExp(`(${escapeRegExp(safeQuery)})`, 'gi');
+        element.innerHTML = safeOriginal.replace(regex, '<span class="highlight">$1</span>');
+      }
+
+      // ── Location Multi-Select Helpers ─────────────────────────────────────
+      function getAvailableOptionLabels() {
+        return locOptionLabels.filter(opt => opt.dataset.available !== 'false');
+      }
+
+      function getSelectedLocations() {
+        const availableOptions = getAvailableOptionLabels();
+        const checked = [];
+        availableOptions.forEach(opt => {
+          const cb = opt.querySelector('.loc-checkbox');
+          if (cb && cb.checked) {
+            checked.push(cb.value.toLowerCase());
+          }
+        });
+        return new Set(checked);
+      }
+
+      function updateLocationTriggerText() {
+        const availableOptions = getAvailableOptionLabels();
+        const availableCbs = availableOptions.map(opt => opt.querySelector('.loc-checkbox')).filter(Boolean);
+        const checkedCount = availableCbs.filter(cb => cb.checked).length;
+        const totalCount = availableCbs.length;
+
+        if (totalCount === 0) {
+          locSelectedLabel.textContent = "No Locations Available";
+        } else if (checkedCount === 0) {
+          locSelectedLabel.textContent = "No Locations Selected";
+        } else if (checkedCount === totalCount) {
+          locSelectedLabel.textContent = "All Locations";
+        } else if (checkedCount === 1) {
+          const first = availableCbs.find(cb => cb.checked);
+          locSelectedLabel.textContent = first ? first.value : "1 Location";
+        } else if (checkedCount === 2) {
+          const names = availableCbs.filter(cb => cb.checked).map(cb => cb.value.split(" / ")[0].split(",")[0]);
+          locSelectedLabel.textContent = names.join(", ");
+        } else {
+          locSelectedLabel.textContent = `${checkedCount} Locations Selected`;
+        }
+      }
+
+      function updateLocationOptionsForCompany(companySlug) {
+        if (locSearch) locSearch.value = '';
+
+        // 1. Identify which cards belong to the selected company
+        const targetCards = (companySlug === 'all')
+          ? companyCards
+          : companyCards.filter(c => c.getAttribute('data-slug') === companySlug);
+
+        // 2. Count locations across target company cards
+        const locCounts = {};
+        targetCards.forEach(card => {
+          const rows = card.querySelectorAll('tr.job-row');
+          rows.forEach(row => {
+            const tags = (row.getAttribute('data-loc-tags') || '').split('|');
+            tags.forEach(t => {
+              if (t) {
+                locCounts[t] = (locCounts[t] || 0) + 1;
+              }
+            });
+          });
+        });
+
+        // 3. Update visibility, count badge, and checkbox for each location option
+        locOptionLabels.forEach(opt => {
+          const cb = opt.querySelector('.loc-checkbox');
+          const val = cb ? cb.value : '';
+          const countSpan = opt.querySelector('.option-count');
+          const count = locCounts[val] || 0;
+
+          if (countSpan) {
+            countSpan.textContent = count;
+          }
+
+          if (count > 0) {
+            opt.style.display = 'flex';
+            opt.dataset.available = 'true';
+            if (cb) cb.checked = true;
+          } else {
+            opt.style.display = 'none';
+            opt.dataset.available = 'false';
+            if (cb) cb.checked = false;
+          }
+        });
+
+        updateLocationTriggerText();
+      }
+
+      // Toggle location dropdown menu
+      locTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = locMenu.style.display !== 'none';
+        locMenu.style.display = isOpen ? 'none' : 'flex';
+        locTrigger.classList.toggle('is-active', !isOpen);
+        locTrigger.setAttribute('aria-expanded', !isOpen);
+        if (!isOpen && locSearch) {
+          setTimeout(() => locSearch.focus(), 50);
+        }
+      });
+
+      // Close location menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!document.getElementById('location-multiselect').contains(e.target)) {
+          locMenu.style.display = 'none';
+          locTrigger.classList.remove('is-active');
+          locTrigger.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      // Filter location options via search box inside dropdown
+      if (locSearch) {
+        locSearch.addEventListener('input', () => {
+          const q = locSearch.value.trim().toLowerCase();
+          locOptionLabels.forEach(opt => {
+            if (opt.dataset.available === 'false') {
+              opt.style.display = 'none';
+              return;
+            }
+            const name = opt.getAttribute('data-loc-name') || '';
+            opt.style.display = !q || name.includes(q) ? 'flex' : 'none';
+          });
+        });
+      }
+
+      // Select All locations
+      btnLocSelectAll.addEventListener('click', (e) => {
+        e.stopPropagation();
+        getAvailableOptionLabels().forEach(opt => {
+          const cb = opt.querySelector('.loc-checkbox');
+          if (cb) cb.checked = true;
+        });
+        updateLocationTriggerText();
+        applyFilters();
+      });
+
+      // Clear All locations
+      btnLocClearAll.addEventListener('click', (e) => {
+        e.stopPropagation();
+        getAvailableOptionLabels().forEach(opt => {
+          const cb = opt.querySelector('.loc-checkbox');
+          if (cb) cb.checked = false;
+        });
+        updateLocationTriggerText();
+        applyFilters();
+      });
+
+      // Checkbox click listener
+      locCheckboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+          updateLocationTriggerText();
+          applyFilters();
+        });
+      });
+
+      // ── Expand / Collapse Individual Company ──────────────────────────────
+      companyCards.forEach(card => {
+        const header = card.querySelector('.company-header');
+        const collapseBtn = card.querySelector('.company-collapse-btn');
+
+        function toggleCompany(e) {
+          // If clicked specifically on another button or link inside header, avoid double toggle
+          if (e.target.closest('a') || e.target.closest('.badge')) return;
+          const isCollapsed = card.classList.toggle('is-collapsed');
+          if (collapseBtn) {
+            collapseBtn.setAttribute('aria-expanded', !isCollapsed);
+          }
+          updateMasterToggleButton();
+        }
+
+        header.addEventListener('click', toggleCompany);
+      });
+
+      // ── Master Expand / Collapse All ──────────────────────────────────────
+      function updateMasterToggleButton() {
+        if (isMerged) return;
+        const visibleCards = companyCards.filter(c => c.style.display !== 'none');
+        if (visibleCards.length === 0) return;
+        const allCollapsed = visibleCards.every(c => c.classList.contains('is-collapsed'));
+
+        if (allCollapsed) {
+          btnToggleAll.classList.add('is-collapsed-all');
+          toggleAllLabel.textContent = "Expand All Tables";
+        } else {
+          btnToggleAll.classList.remove('is-collapsed-all');
+          toggleAllLabel.textContent = "Collapse All Tables";
+        }
+      }
+
+      btnToggleAll.addEventListener('click', () => {
+        if (isMerged) return;
+        const visibleCards = companyCards.filter(c => c.style.display !== 'none');
+        const anyExpanded = visibleCards.some(c => !c.classList.contains('is-collapsed'));
+
+        visibleCards.forEach(card => {
+          if (anyExpanded) {
+            card.classList.add('is-collapsed');
+            const btn = card.querySelector('.company-collapse-btn');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+          } else {
+            card.classList.remove('is-collapsed');
+            const btn = card.querySelector('.company-collapse-btn');
+            if (btn) btn.setAttribute('aria-expanded', 'true');
+          }
+        });
+        updateMasterToggleButton();
+      });
+
+      // ── Merge All Tables Toggle ───────────────────────────────────────────
+      btnMergeAll.addEventListener('click', () => {
+        isMerged = !isMerged;
+        if (isMerged) {
+          companiesContainer.style.display = 'none';
+          mergedContainer.style.display = 'block';
+          btnToggleAll.style.display = 'none';
+          btnMergeAll.classList.add('is-merged-active');
+          mergeAllLabel.textContent = 'Split by Company';
+          if (mergeStatusPill) mergeStatusPill.style.display = 'inline-flex';
+        } else {
+          companiesContainer.style.display = 'block';
+          mergedContainer.style.display = 'none';
+          btnToggleAll.style.display = 'inline-flex';
+          btnMergeAll.classList.remove('is-merged-active');
+          mergeAllLabel.textContent = 'Merge All Tables';
+          if (mergeStatusPill) mergeStatusPill.style.display = 'none';
+        }
+        applyFilters();
+      });
+
+      // ── Main Filter Logic (Company + Location Multi-Select + Role Name) ───
+      function applyFilters() {
+        const selectedCompanySlug = companySelect.value; // 'all' or company slug
+        const selectedLocations = getSelectedLocations();
+        const availableOptions = getAvailableOptionLabels();
+        const totalAvailable = availableOptions.length;
+        const acceptAllLocations = (totalAvailable === 0) || (selectedLocations.size === totalAvailable);
+        const roleQuery = roleFilter.value.trim().toLowerCase();
+
+        let totalVisibleJobs = 0;
+
+        if (isMerged && mergedTableCard) {
+          // Merged Table filtering
+          const rows = Array.from(mergedTableCard.querySelectorAll('tbody tr.job-row'));
+          const noMatchRow = mergedTableCard.querySelector('tr.no-match-row');
+          let visibleRows = 0;
+
+          rows.forEach(row => {
+            const rowSlug = row.getAttribute('data-slug');
+            const matchesCompany = (selectedCompanySlug === 'all') || (rowSlug === selectedCompanySlug);
+
+            const roleNameElem = row.querySelector('.role-name');
+            const originalTitle = row.getAttribute('data-title') || roleNameElem.textContent;
+            const matchesRole = !roleQuery || originalTitle.toLowerCase().includes(roleQuery);
+
+            let matchesLocation = acceptAllLocations;
+            if (!matchesLocation) {
+              const rawLoc = (row.getAttribute('data-location') || '').toLowerCase();
+              const rowTags = (row.getAttribute('data-loc-tags') || '').toLowerCase().split('|');
+              matchesLocation = rowTags.some(tag => selectedLocations.has(tag)) ||
+                                Array.from(selectedLocations).some(sel => rawLoc.includes(sel));
+            }
+
+            const isRowApplied = row.getAttribute('data-applied') === 'true';
+            const matchesApplied = !hideApplied || !isRowApplied;
+
+            if (matchesCompany && matchesRole && matchesLocation && matchesApplied) {
+              row.style.display = '';
+              visibleRows++;
+              totalVisibleJobs++;
+              highlightText(roleNameElem, originalTitle, roleQuery);
+            } else {
+              row.style.display = 'none';
+            }
+          });
+
+          recalcSerialNumbers(mergedTableCard);
+
+          if (rows.length > 0 && noMatchRow) {
+            noMatchRow.style.display = (visibleRows === 0) ? '' : 'none';
+          }
+
+          const mergedBadgeCount = document.getElementById('merged-badge-count');
+          if (mergedBadgeCount) {
+            if ((roleQuery || !acceptAllLocations || selectedCompanySlug !== 'all') && rows.length > 0) {
+              mergedBadgeCount.textContent = `${visibleRows} of ${rows.length} jobs`;
+            } else {
+              mergedBadgeCount.textContent = `${rows.length} jobs`;
+            }
+          }
+        } else {
+          // Split Company Tables filtering
+          let totalVisibleCompanies = 0;
+
+          companyCards.forEach(card => {
+            const cardSlug = card.getAttribute('data-slug');
+
+            // 1. Company dropdown match
+            const matchesCompany = (selectedCompanySlug === 'all') || (cardSlug === selectedCompanySlug);
+            if (!matchesCompany) {
+              card.style.display = 'none';
+              return;
+            }
+
+            // If a specific company is selected in the dropdown, ensure its table is open
+            if (selectedCompanySlug !== 'all' && card.classList.contains('is-collapsed')) {
+              card.classList.remove('is-collapsed');
+              const btn = card.querySelector('.company-collapse-btn');
+              if (btn) btn.setAttribute('aria-expanded', 'true');
+            }
+
+            // 2. Row filtering: Location & Role Name
+            const rows = Array.from(card.querySelectorAll('tr.job-row'));
+            const noMatchRow = card.querySelector('tr.no-match-row');
+            let visibleRowsInCompany = 0;
+
+            rows.forEach(row => {
+              const roleNameElem = row.querySelector('.role-name');
+              const originalTitle = row.getAttribute('data-title') || roleNameElem.textContent;
+              const matchesRole = !roleQuery || originalTitle.toLowerCase().includes(roleQuery);
+
+              // Location match
+              let matchesLocation = acceptAllLocations;
+              if (!matchesLocation) {
+                const rawLoc = (row.getAttribute('data-location') || '').toLowerCase();
+                const rowTags = (row.getAttribute('data-loc-tags') || '').toLowerCase().split('|');
+                matchesLocation = rowTags.some(tag => selectedLocations.has(tag)) ||
+                                  Array.from(selectedLocations).some(sel => rawLoc.includes(sel));
+              }
+
+              const isRowApplied = row.getAttribute('data-applied') === 'true';
+              const matchesApplied = !hideApplied || !isRowApplied;
+
+              if (matchesRole && matchesLocation && matchesApplied) {
+                row.style.display = '';
+                visibleRowsInCompany++;
+                totalVisibleJobs++;
+                highlightText(roleNameElem, originalTitle, roleQuery);
+              } else {
+                row.style.display = 'none';
+              }
+            });
+
+            // Re-calculate sequential S.No for visible rows
+            recalcSerialNumbers(card);
+
+            // Handle no matching rows in this company
+            if (rows.length > 0 && noMatchRow) {
+              noMatchRow.style.display = (visibleRowsInCompany === 0) ? '' : 'none';
+            }
+
+            card.style.display = '';
+            totalVisibleCompanies++;
+
+            // Update company card count badge dynamically
+            const countBadge = card.querySelector('.badge-count');
+            if (countBadge) {
+              if ((roleQuery || !acceptAllLocations) && rows.length > 0) {
+                countBadge.textContent = `${visibleRowsInCompany} of ${rows.length} jobs`;
+              } else {
+                countBadge.textContent = `${rows.length} jobs`;
+              }
+            }
+          });
+
+          updateMasterToggleButton();
+        }
+
+        // Update Visible Counter
+        if (roleQuery || !acceptAllLocations || selectedCompanySlug !== 'all') {
+          visibleCounter.innerHTML = `Showing <strong>${totalVisibleJobs}</strong> of ${totalInitialJobs} jobs`;
+        } else {
+          visibleCounter.innerHTML = `Showing <strong>${totalInitialJobs}</strong> of ${totalInitialJobs} jobs`;
+        }
+
+        // Global empty state
+        if (totalVisibleJobs === 0 && totalInitialJobs > 0) {
+          globalEmptyState.style.display = 'block';
+        } else {
+          globalEmptyState.style.display = 'none';
+        }
+      }
+
+      function recalcSerialNumbers(card) {
+        let counter = 1;
+        const visibleJobRows = card.querySelectorAll('tbody tr.job-row:not([style*="display: none"])');
+        visibleJobRows.forEach(row => {
+          const snoElem = row.querySelector('.col-sno');
+          if (snoElem) snoElem.textContent = counter++;
+        });
+      }
+
+      // ── Column Sorting (Company, Title, Location, Posted Date) ────────────
+      // State per table: { sortKey: 'company'|'title'|'location'|'date'|null, sortOrder: 'asc'|'desc'|null }
+      document.querySelectorAll('.company-card').forEach(card => {
+        const tbody = card.querySelector('tbody');
+        if (!tbody) return;
+        const sortButtons = card.querySelectorAll('.btn-sort');
+
+        sortButtons.forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const sortKey = btn.getAttribute('data-sort'); // 'company', 'title', 'location', 'date'
+
+            // Determine next state: none -> asc -> desc -> none
+            // (or none -> desc -> asc -> none for date: desc=newest first)
+            let nextOrder = 'asc';
+            if (btn.classList.contains('sort-asc')) {
+              nextOrder = 'desc';
+            } else if (btn.classList.contains('sort-desc')) {
+              nextOrder = 'none';
+            } else {
+              nextOrder = (sortKey === 'date') ? 'desc' : 'asc';
+            }
+
+            // Reset all sort buttons in this table
+            sortButtons.forEach(b => {
+              b.classList.remove('sort-asc', 'sort-desc');
+            });
+
+            if (nextOrder !== 'none') {
+              btn.classList.add(nextOrder === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+
+            // Sort rows
+            const rows = Array.from(tbody.querySelectorAll('tr.job-row'));
+            if (rows.length === 0) return;
+
+            if (nextOrder === 'none') {
+              // Restore original order
+              rows.sort((a, b) => {
+                const idxA = parseInt(a.getAttribute('data-orig-idx') || '0', 10);
+                const idxB = parseInt(b.getAttribute('data-orig-idx') || '0', 10);
+                return idxA - idxB;
+              });
+            } else if (sortKey === 'company') {
+              rows.sort((a, b) => {
+                const compA = (a.getAttribute('data-company') || '').toLowerCase();
+                const compB = (b.getAttribute('data-company') || '').toLowerCase();
+                const cmp = compA.localeCompare(compB);
+                return nextOrder === 'asc' ? cmp : -cmp;
+              });
+            } else if (sortKey === 'title') {
+              rows.sort((a, b) => {
+                const titleA = (a.getAttribute('data-title') || '').toLowerCase();
+                const titleB = (b.getAttribute('data-title') || '').toLowerCase();
+                const cmp = titleA.localeCompare(titleB);
+                return nextOrder === 'asc' ? cmp : -cmp;
+              });
+            } else if (sortKey === 'location') {
+              rows.sort((a, b) => {
+                const locA = (a.getAttribute('data-location') || '').toLowerCase();
+                const locB = (b.getAttribute('data-location') || '').toLowerCase();
+                const cmp = locA.localeCompare(locB);
+                return nextOrder === 'asc' ? cmp : -cmp;
+              });
+            } else if (sortKey === 'date') {
+              rows.sort((a, b) => {
+                // data-days: smaller days = newer
+                const daysA = parseInt(a.getAttribute('data-days') || '999999', 10);
+                const daysB = parseInt(b.getAttribute('data-days') || '999999', 10);
+                if (daysA !== daysB) {
+                  return nextOrder === 'desc' ? (daysA - daysB) : (daysB - daysA);
+                }
+                const dateA = a.getAttribute('data-date') || '';
+                const dateB = b.getAttribute('data-date') || '';
+                const cmp = dateA.localeCompare(dateB);
+                return nextOrder === 'desc' ? -cmp : cmp;
+              });
+            }
+
+            // Re-insert sorted rows into tbody before any empty/match status rows
+            const noJobsRow = tbody.querySelector('tr.no-jobs-row');
+            const noMatchRow = tbody.querySelector('tr.no-match-row');
+            rows.forEach(r => tbody.appendChild(r));
+            if (noJobsRow) tbody.appendChild(noJobsRow);
+            if (noMatchRow) tbody.appendChild(noMatchRow);
+
+            // Update sequential S.No
+            recalcSerialNumbers(card);
+          });
+        });
+      });
+
+      // ── Event Listeners ───────────────────────────────────────────────────
+      companySelect.addEventListener('change', () => {
+        updateLocationOptionsForCompany(companySelect.value);
+        applyFilters();
+      });
+      roleFilter.addEventListener('input', applyFilters);
+
+      btnReset.addEventListener('click', () => {
+        companySelect.value = 'all';
+        roleFilter.value = '';
+        updateLocationOptionsForCompany('all');
+
+        // Expand all cards
+        companyCards.forEach(card => {
+          card.classList.remove('is-collapsed');
+          const btn = card.querySelector('.company-collapse-btn');
+          if (btn) btn.setAttribute('aria-expanded', 'true');
+        });
+
+        // Reset sort buttons across all tables
+        document.querySelectorAll('.btn-sort').forEach(b => {
+          b.classList.remove('sort-asc', 'sort-desc');
+        });
+
+        // Restore original row orders across all tables
+        document.querySelectorAll('.company-card').forEach(card => {
+          const tbody = card.querySelector('tbody');
+          if (!tbody) return;
+          const rows = Array.from(tbody.querySelectorAll('tr.job-row'));
+          rows.sort((a, b) => {
+            const idxA = parseInt(a.getAttribute('data-orig-idx') || '0', 10);
+            const idxB = parseInt(b.getAttribute('data-orig-idx') || '0', 10);
+            return idxA - idxB;
+          });
+          const noJobsRow = tbody.querySelector('tr.no-jobs-row');
+          const noMatchRow = tbody.querySelector('tr.no-match-row');
+          rows.forEach(r => tbody.appendChild(r));
+          if (noJobsRow) tbody.appendChild(noJobsRow);
+          if (noMatchRow) tbody.appendChild(noMatchRow);
+        });
+
+        applyFilters();
+      });
+
+      // Keyboard Esc to clear search
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (document.activeElement === roleFilter) {
+            roleFilter.value = '';
+            applyFilters();
+          } else if (locMenu.style.display !== 'none') {
+            locMenu.style.display = 'none';
+            locTrigger.classList.remove('is-active');
+            locTrigger.setAttribute('aria-expanded', 'false');
+          }
+        }
+      });
+
+      // ── Applied Jobs Click & Toggle Handlers ──────────────────────────────
+      document.addEventListener('click', async (e) => {
+        const markBtn = e.target.closest('.btn-mark-apply');
+        const unmarkBtn = e.target.closest('.btn-unmark-apply');
+
+        if (markBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          const group = markBtn.closest('.apply-action-group');
+          if (!group) return;
+          const company = group.getAttribute('data-company') || '';
+          const jobId = group.getAttribute('data-jobid') || '';
+          const jobIdFull = group.getAttribute('data-jobid-full') || '';
+          const role = group.getAttribute('data-role') || '';
+
+          // 1. Mark in map
+          const item = { company, job_id: jobId, role, applied_at: new Date().toISOString() };
+          if (jobIdFull && jobIdFull !== jobId) item.job_id_full = jobIdFull;
+          appliedJobsMap.set(normalizeKey(company, jobId), item);
+          if (jobIdFull) appliedJobsMap.set(normalizeKey(company, jobIdFull), item);
+
+          // 2. Update UI across all matching rows
+          updateAllRowsMatching(company, jobId, jobIdFull, true);
+          updateAppliedCountDisplay();
+          applyFilters();
+
+          // 3. Save to localStorage cache
+          try {
+            const arr = Array.from(appliedJobsMap.values());
+            localStorage.setItem('jobfinder_applied_jobs', JSON.stringify(arr));
+          } catch (err) {}
+
+          // 4. Send to server
+          let savedOnServer = false;
+          const endpoints = ['/api/applied', 'http://127.0.0.1:8000/api/applied'];
+          for (const ep of endpoints) {
+            try {
+              const resp = await fetch(ep, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ company, job_id: jobId, role, job_id_full: jobIdFull }),
+              });
+              if (resp.ok) {
+                savedOnServer = true;
+                showToast(`✓ Marked "${role || jobId}" at ${company} as applied. Saved to applied_jobs.json!`);
+                break;
+              }
+            } catch (err) {}
+          }
+          if (!savedOnServer) {
+            showToast(`✓ Marked as applied locally! Run "python cli.py serve" to sync directly to applied_jobs.json.`);
+          }
+        } else if (unmarkBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          const group = unmarkBtn.closest('.apply-action-group');
+          if (!group) return;
+          const company = group.getAttribute('data-company') || '';
+          const jobId = group.getAttribute('data-jobid') || '';
+          const jobIdFull = group.getAttribute('data-jobid-full') || '';
+
+          // 1. Unmark in map
+          appliedJobsMap.delete(normalizeKey(company, jobId));
+          if (jobIdFull) appliedJobsMap.delete(normalizeKey(company, jobIdFull));
+
+          // 2. Update UI across rows
+          updateAllRowsMatching(company, jobId, jobIdFull, false);
+          updateAppliedCountDisplay();
+          applyFilters();
+
+          // 3. Save to localStorage cache
+          try {
+            const arr = Array.from(appliedJobsMap.values());
+            localStorage.setItem('jobfinder_applied_jobs', JSON.stringify(arr));
+          } catch (err) {}
+
+          // 4. Send to server
+          let unmarkOnServer = false;
+          const endpoints = ['/api/unapply', 'http://127.0.0.1:8000/api/unapply'];
+          for (const ep of endpoints) {
+            try {
+              const resp = await fetch(ep, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ company, job_id: jobId }),
+              });
+              if (resp.ok) {
+                unmarkOnServer = true;
+                showToast(`Unmarked job at ${company}. Updated applied_jobs.json.`);
+                break;
+              }
+            } catch (err) {}
+          }
+          if (!unmarkOnServer) {
+            showToast(`Unmarked job locally.`);
+          }
+        }
+      });
+
+      if (btnToggleApplied) {
+        btnToggleApplied.addEventListener('click', () => {
+          hideApplied = !hideApplied;
+          btnToggleApplied.classList.toggle('is-active', hideApplied);
+          btnToggleApplied.setAttribute('aria-pressed', hideApplied ? 'true' : 'false');
+          if (toggleAppliedLabel) {
+            toggleAppliedLabel.textContent = hideApplied ? 'Showing Unapplied (Click to Show All)' : 'Hide Applied';
+          }
+          applyFilters();
+        });
+      }
+
+      // Initial location & filter setup
+      updateLocationOptionsForCompany(companySelect.value || 'all');
+      applyFilters();
+      syncAppliedJobsFromServer();
+    })();
+  </script>
+
+  <div id="jobfinder-toast"></div>
+  <script id="applied-jobs-data" type="application/json">{{APPLIED_JOBS_JSON}}</script>
+</body>
+</html>

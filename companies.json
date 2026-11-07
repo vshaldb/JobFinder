@@ -1,0 +1,427 @@
+[
+  {
+    "name": "Google",
+    "ats": "workday",
+    "tenant": "google",
+    "datacenter": "wd3",
+    "site_name": "googlejobs",
+    "enabled": true,
+    "domain": "tech"
+  },
+  {
+    "name": "NVIDIA",
+    "ats": "workday",
+    "tenant": "nvidia",
+    "datacenter": "wd5",
+    "site_name": "NVIDIAExternalCareerSite",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Salesforce",
+    "ats": "workday",
+    "tenant": "salesforce",
+    "datacenter": "wd12",
+    "site_name": "External_Career_Site",
+    "enabled": true,
+    "domain": "tech"
+  },
+  {
+    "name": "Workday",
+    "ats": "workday",
+    "tenant": "workday",
+    "datacenter": "wd5",
+    "site_name": "workdayprofessional",
+    "enabled": true,
+    "domain": "tech"
+  },
+  {
+    "name": "Procter & Gamble",
+    "ats": "workday",
+    "tenant": "pg",
+    "datacenter": "wd3",
+    "site_name": "ProcterGamble",
+    "enabled": true,
+    "domain": "consumer"
+  },
+  {
+    "name": "Intel",
+    "ats": "workday",
+    "tenant": "intel",
+    "datacenter": "wd1",
+    "site_name": "External",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Broadcom",
+    "ats": "workday",
+    "tenant": "broadcom",
+    "datacenter": "wd1",
+    "site_name": "External_Career",
+    "skip_country_filter": true,
+    "default_locations": [
+      "2a204116f85f01189cd964af936b70fb",
+      "877d747df71910021363ea290d900000",
+      "0dd627624e2e0176f301cad8dcd9ab0b",
+      "86fa603fbe121001e54578757e6b0000",
+      "2d466ab4e6e0013cf503069082349dd2"
+    ],
+    "default_location_names": [
+      "IND-Bangalore Electronic City - S1",
+      "IND-Bangalore-Kalyani Vista II",
+      "IND-Hyderabad 115 IT Park Area",
+      "IND-Hyderabad 115 IT Park Area (Chennai Service Office)",
+      "IND-Pune EON Kharadi Infrastructure"
+    ],
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Marvell",
+    "ats": "workday",
+    "tenant": "marvell",
+    "datacenter": "wd1",
+    "site_name": "MarvellCareers",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Analog Devices",
+    "ats": "workday",
+    "tenant": "analogdevices",
+    "datacenter": "wd1",
+    "site_name": "External",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "NXP Semiconductors",
+    "ats": "workday",
+    "tenant": "nxp",
+    "datacenter": "wd3",
+    "site_name": "careers",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Microchip Technology",
+    "ats": "workday",
+    "tenant": "microchiphr",
+    "datacenter": "wd5",
+    "site_name": "External",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Cadence",
+    "ats": "workday",
+    "tenant": "cadence",
+    "datacenter": "wd1",
+    "site_name": "External_Careers",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "SiFive",
+    "ats": "workday",
+    "tenant": "sifive",
+    "datacenter": "wd1",
+    "site_name": "sifivecareers",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "KLA",
+    "ats": "workday",
+    "tenant": "kla",
+    "datacenter": "wd1",
+    "site_name": "Search",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Silicon Labs",
+    "ats": "workday",
+    "tenant": "silabs",
+    "datacenter": "wd1",
+    "site_name": "SiliconlabsCareers",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Wolfspeed",
+    "ats": "workday",
+    "tenant": "cree",
+    "datacenter": "wd108",
+    "site_name": "EXT",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Allegro MicroSystems",
+    "ats": "workday",
+    "tenant": "allegromicro",
+    "datacenter": "wd5",
+    "site_name": "AllegroCareers",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Entegris",
+    "ats": "workday",
+    "tenant": "entegris",
+    "datacenter": "wd1",
+    "site_name": "EntegrisCareers",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Qualcomm",
+    "ats": "eightfold",
+    "subdomain": "qualcomm",
+    "domain_param": "qualcomm.com",
+    "career_site_url": "https://careers.qualcomm.com",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Micron Technology",
+    "ats": "eightfold",
+    "subdomain": "micron",
+    "domain_param": "micron.com",
+    "career_site_url": "https://micron.eightfold.ai",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Infineon",
+    "ats": "eightfold",
+    "subdomain": "infineon",
+    "domain_param": "infineon.com",
+    "career_site_url": "https://infineon.eightfold.ai",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Applied Materials",
+    "ats": "eightfold",
+    "subdomain": "appliedmaterials",
+    "domain_param": "appliedmaterials.com",
+    "career_site_url": "https://appliedmaterials.eightfold.ai",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Lam Research",
+    "ats": "eightfold",
+    "subdomain": "lamresearch",
+    "domain_param": "lamresearch.com",
+    "career_site_url": "https://lamresearch.eightfold.ai",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Tenstorrent",
+    "ats": "greenhouse",
+    "board_token": "tenstorrent",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "SambaNova Systems",
+    "ats": "greenhouse",
+    "board_token": "sambanovasystems",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Samsung Semiconductor",
+    "ats": "workday",
+    "tenant": "sec",
+    "datacenter": "wd3",
+    "site_name": "Samsung_Careers",
+    "default_locations": [
+      "0c974e8c1228010867596ab21b3c3469",
+      "189767dd6c9201004b83aa89a5295a80"
+    ],
+    "default_location_names": [
+      "SSIR, Goldstone, Bangalore, India",
+      "Two Horizon Center, Gurugram, India"
+    ],
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Lightmatter",
+    "ats": "greenhouse",
+    "board_token": "lightmatter",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Astera Labs",
+    "ats": "greenhouse",
+    "board_token": "asteralabs",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Etched",
+    "ats": "greenhouse",
+    "board_token": "etchedai",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "ARM",
+    "ats": "icims",
+    "portal_type": "experienced",
+    "subdomain": "experienced-arm",
+    "career_site_url": "https://careers.arm.com",
+    "search_url": "https://careers.arm.com/search-jobs",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "AMD",
+    "ats": "icims",
+    "portal_type": "jibe",
+    "subdomain": "global-external-amd",
+    "api_url": "https://careers.amd.com/api/jobs",
+    "career_site_url": "https://careers.amd.com",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "TYLsemi",
+    "ats": "rippling",
+    "board_slug": "tylsemi",
+    "career_site_url": "https://ats.rippling.com/tylsemi/jobs",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Keysight Technologies",
+    "ats": "icims",
+    "portal_type": "jibe",
+    "subdomain": "globalcareers-keysight",
+    "api_url": "https://jobs.keysight.com/api/jobs",
+    "career_site_url": "https://jobs.keysight.com/external",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Autodesk",
+    "ats": "eightfold",
+    "host": "jobs.autodesk.com",
+    "subdomain": "autodesk",
+    "domain_param": "autodesk.com",
+    "career_site_url": "https://jobs.autodesk.com",
+    "enabled": true,
+    "domain": "tech"
+  },
+  {
+    "name": "STMicroelectronics",
+    "ats": "eightfold",
+    "subdomain": "stmicroelectronics",
+    "domain_param": "stmicroelectronics.com",
+    "search_endpoint": "apply_v2",
+    "career_site_url": "https://stmicroelectronics.eightfold.ai",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "GlobalFoundries",
+    "ats": "eightfold",
+    "host": "careers.gf.com",
+    "subdomain": "globalfoundries",
+    "domain_param": "globalfoundries.com",
+    "career_site_url": "https://careers.gf.com",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Graphcore",
+    "ats": "greenhouse",
+    "board_token": "graphcore",
+    "career_site_url": "https://www.graphcore.ai/careers",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Altera",
+    "ats": "workday",
+    "tenant": "altera",
+    "datacenter": "wd1",
+    "site_name": "Altera",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Lattice Semiconductor",
+    "ats": "workday",
+    "tenant": "latticesemi",
+    "datacenter": "wd5",
+    "site_name": "latticesemiconductorscareers",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Semtech",
+    "ats": "workday",
+    "tenant": "semtech",
+    "datacenter": "wd1",
+    "site_name": "SemtechCareers",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Baya Systems",
+    "ats": "greenhouse",
+    "board_token": "bayasystems",
+    "career_site_url": "https://www.bayasystems.com/careers",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "InnoPhase IoT",
+    "ats": "greenhouse",
+    "board_token": "innophaseiot",
+    "career_site_url": "https://innophaseiot.com/careers",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Cerebras Systems",
+    "ats": "ashby",
+    "board_token": "cerebras",
+    "career_site_url": "https://jobs.ashbyhq.com/cerebras",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "d-Matrix",
+    "ats": "ashby",
+    "board_token": "d-matrix",
+    "career_site_url": "https://jobs.ashbyhq.com/d-matrix",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Nuvacore",
+    "ats": "lever",
+    "site_name": "nuvacore",
+    "career_site_url": "https://jobs.lever.co/nuvacore",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Eliyan",
+    "ats": "lever",
+    "site_name": "eliyan",
+    "career_site_url": "https://jobs.lever.co/eliyan",
+    "enabled": true,
+    "domain": "semiconductor"
+  }
+]
