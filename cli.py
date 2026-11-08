@@ -104,7 +104,8 @@ def cli() -> None:
     ╔══════════════════════════════════════════════════════════╗
     ║        JobFinder — Multi-Portal Careers CLI              ║
     ║ Supported ATS: Workday | Eightfold | Greenhouse | iCIMS  ║
-    ║               Rippling | Ashby | Lever                  ║
+    ║        Rippling | Ashby | Lever | Google | Meta          ║
+    ║                    Apple | Amazon                        ║
     ╚══════════════════════════════════════════════════════════╝
 
     Fetch job postings from multiple corporate career portals and save them
@@ -161,7 +162,7 @@ def cli() -> None:
     "--ats", "-a",
     default="all",
     show_default=True,
-    help="Filter by ATS provider ('all', 'workday', 'eightfold', 'greenhouse', 'icims', 'rippling', 'ashby', 'lever').",
+    help="Filter by ATS provider ('all', 'workday', 'eightfold', 'greenhouse', 'icims', 'rippling', 'ashby', 'lever', 'google', 'meta', 'apple', 'amazon').",
 )
 @click.option(
     "--domain", "-D",
@@ -417,7 +418,7 @@ def fetch(
     "--ats", "-a",
     default="all",
     show_default=True,
-    help="Filter by ATS provider ('all', 'workday', 'eightfold', 'greenhouse', 'icims', 'rippling', 'ashby', 'lever').",
+    help="Filter by ATS provider ('all', 'workday', 'eightfold', 'greenhouse', 'icims', 'rippling', 'ashby', 'lever', 'google', 'meta', 'apple', 'amazon').",
 )
 @click.option(
     "--domain", "-D",
@@ -456,7 +457,10 @@ def companies_cmd(
         if c_ats == "workday":
             target = f"{c.get('tenant')}.{c.get('datacenter')} / {c.get('site_name')}"
         elif c_ats in ("eightfold", "eightfold.ai"):
-            target = f"{c.get('subdomain')}.eightfold.ai ({c.get('domain_param')})"
+            if c.get("host"):
+                target = f"{c.get('host')} ({c.get('extra_params', {}).get('domain', '')})"
+            else:
+                target = f"{c.get('subdomain')}.eightfold.ai ({c.get('domain_param')})"
         elif c_ats == "greenhouse":
             target = f"board: {c.get('board_token')}"
         elif c_ats in ("icims", "talentbrew"):
@@ -468,6 +472,14 @@ def companies_cmd(
             target = f"ashbyhq.com/{c.get('board_token', '')}"
         elif c_ats == "lever":
             target = f"lever.co/{c.get('site_name', '')}"
+        elif c_ats == "google":
+            target = "careers.google.com"
+        elif c_ats == "meta":
+            target = "metacareers.com"
+        elif c_ats == "apple":
+            target = f"jobs.apple.com ({c.get('locale', 'en-in')})"
+        elif c_ats == "amazon":
+            target = f"amazon.jobs ({c.get('category', 'software-development')})"
         else:
             target = c.get("tenant", "")
 

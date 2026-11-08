@@ -1,6 +1,6 @@
 # JobFinder 🔍
 
-A high-performance command-line careers crawler, data normalizer, and interactive dashboard that fetches real-time job openings from corporate career portals across **Workday**, **Eightfold.ai**, **Greenhouse**, **iCIMS**, **Rippling**, **Ashby**, and **Lever**.
+A high-performance command-line careers crawler, data normalizer, and interactive dashboard that fetches real-time job openings from corporate career portals across **Workday**, **Eightfold.ai**, **Greenhouse**, **iCIMS**, **Rippling**, **Ashby**, **Lever**, **Google**, **Meta**, **Apple**, and **Amazon**.
 
 Includes an interactive web dashboard with multi-location filters, instant role searching, table merging, and a built-in application tracking system to mark and track applied jobs.
 
@@ -8,8 +8,8 @@ Includes an interactive web dashboard with multi-location filters, instant role 
 
 ## Features
 
-- **Multi-ATS Support**: Directly interfaces with candidate APIs across 7 major ATS platforms without headless browsers.
-- **46+ Pre-Configured Companies**: Semiconductor leaders, AI hardware startups, and tech giants pre-configured out of the box.
+- **Multi-ATS Support**: Directly interfaces with candidate APIs across 11 major ATS platforms and career portals without headless browsers.
+- **50+ Pre-Configured Companies**: Tech giants (Google, Microsoft, Meta, Apple, Amazon), semiconductor leaders, and AI hardware innovators pre-configured out of the box.
 - **Smart Location Normalization**: Tech-hub normalization for Indian centers (Bengaluru, Hyderabad, Pune, Noida, Gurgaon, Chennai) and global sites.
 - **Interactive Web Dashboard**: Auto-generated standalone HTML report (`job_data/index.html`) with zero CDN dependencies.
 - **Merge All Tables View**: One-click toggle to merge all company tables into a unified view for sorting newest jobs across all companies.
@@ -26,6 +26,11 @@ Includes an interactive web dashboard with multi-location filters, instant role 
 
 | Platform | Protocol / API | Example Companies |
 | :--- | :--- | :--- |
+| **Google** | Embedded JSON Data Callback (`AF_initDataCallback`) | Google |
+| **Microsoft (Eightfold)** | Eightfold PCSX Search API with Session Pre-warming | Microsoft |
+| **Meta** | Relay GraphQL Candidate Portal API (`CareersJobSearchResultsV2DataQuery`) | Meta |
+| **Apple** | Apple Jobs REST API with CSRF Token Authentication | Apple |
+| **Amazon** | Amazon Jobs Search API (`search.json` with Software Development filtering) | Amazon |
 | **Workday** | Candidate Experience Site (CXS) REST API | NVIDIA, Intel, Broadcom, Marvell, SiFive, KLA, Silicon Labs, Wolfspeed, Cadence, Analog Devices |
 | **Eightfold.ai** | Talent Intelligence PCSX & Career APIs | Qualcomm, Micron Technology, Infineon, Applied Materials, Lam Research, STMicroelectronics, Autodesk, GlobalFoundries |
 | **Greenhouse** | Public Job Board REST API | Astera Labs, Tenstorrent, SambaNova Systems, Graphcore, Baya Systems, Lightmatter, Etched |
@@ -36,13 +41,18 @@ Includes an interactive web dashboard with multi-location filters, instant role 
 
 ---
 
-## Pre-Configured Companies (46 Companies)
+## Pre-Configured Companies (50 Companies)
 
 <details>
 <summary><strong>Click to view the full directory of pre-configured companies</strong></summary>
 
 | Company | Platform | Focus Area | Primary India Sites |
 | :--- | :--- | :--- | :--- |
+| **Google** | Google | Tech / Cloud, Search, AI & Systems | Bengaluru, Hyderabad, Gurugram, Mumbai |
+| **Microsoft** | Eightfold.ai | Tech / Cloud, OS, AI & Enterprise | Bengaluru, Hyderabad, Noida |
+| **Meta** | Meta | Tech / Social, AI, Messaging & Hardware | Bengaluru, Gurgaon, Hyderabad, Mumbai |
+| **Apple** | Apple | Tech / Hardware, OS, Services & Retail | Bengaluru, Hyderabad, Gurugram, Mumbai |
+| **Amazon** | Amazon | Tech / Cloud (AWS), Software & Systems | Bengaluru, Hyderabad, Chennai, Delhi NCR |
 | **ARM** | iCIMS | Semiconductor / CPU IP | Bengaluru, Noida |
 | **AMD** | iCIMS | Semiconductor / GPU & CPU | Bengaluru, Hyderabad |
 | **Keysight Technologies** | iCIMS | Semiconductor & Electronic Test | Gurgaon, Bengaluru |
@@ -80,7 +90,6 @@ Includes an interactive web dashboard with multi-location filters, instant role 
 | **Nuvacore** | Lever | Semiconductor / CPU Core Architecture | Bengaluru |
 | **Eliyan** | Lever | Semiconductor / Chiplet Interconnect PHY | Global |
 | **Samsung Semiconductor** | Workday | Semiconductor / Memory, Foundry & LSI | Bengaluru (SSIR Goldstone), Gurugram |
-| **Google** | Workday | Tech & Systems | Bengaluru, Hyderabad |
 | **Salesforce** | Workday | Tech / Cloud | Bengaluru, Hyderabad |
 | **Allegro MicroSystems** | Workday | Semiconductor / Magnetic Sensors & Power | Bengaluru |
 | **Entegris** | Workday | Semiconductor Materials & Filtration | Bengaluru |
@@ -171,6 +180,10 @@ python cli.py fetch --ats icims
 python cli.py fetch --ats ashby
 python cli.py fetch --ats lever
 python cli.py fetch --ats rippling
+python cli.py fetch --ats google
+python cli.py fetch --ats meta
+python cli.py fetch --ats apple
+python cli.py fetch --ats amazon
 ```
 
 ### 7. Filter by Domain & Recency

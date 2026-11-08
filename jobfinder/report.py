@@ -176,6 +176,14 @@ def build_merged_section(
                 badge_class = "badge-ats-ashby"
             elif "lever" in ats_lower:
                 badge_class = "badge-ats-lever"
+            elif "google" in ats_lower:
+                badge_class = "badge-ats-google"
+            elif "meta" in ats_lower:
+                badge_class = "badge-ats-meta"
+            elif "apple" in ats_lower:
+                badge_class = "badge-ats-apple"
+            elif "amazon" in ats_lower:
+                badge_class = "badge-ats-amazon"
             else:
                 badge_class = "badge-ats-default"
 
@@ -446,6 +454,14 @@ def generate_html_report(
             badge_class = "badge-ats-ashby"
         elif "lever" in ats_lower:
             badge_class = "badge-ats-lever"
+        elif "google" in ats_lower:
+            badge_class = "badge-ats-google"
+        elif "meta" in ats_lower:
+            badge_class = "badge-ats-meta"
+        elif "apple" in ats_lower:
+            badge_class = "badge-ats-apple"
+        elif "amazon" in ats_lower:
+            badge_class = "badge-ats-amazon"
         else:
             badge_class = "badge-ats-default"
 

@@ -1,10 +1,48 @@
 [
   {
     "name": "Google",
-    "ats": "workday",
-    "tenant": "google",
-    "datacenter": "wd3",
-    "site_name": "googlejobs",
+    "ats": "google",
+    "career_site_url": "https://www.google.com/about/careers/applications/jobs/results",
+    "enabled": true,
+    "domain": "tech"
+  },
+  {
+    "name": "Microsoft",
+    "ats": "eightfold",
+    "host": "apply.careers.microsoft.com",
+    "career_site_url": "https://apply.careers.microsoft.com/careers?start=0&pid=1970393557056265&sort_by=timestamp",
+    "extra_params": {
+      "domain": "microsoft.com",
+      "pid": "1970393557056265",
+      "sort_by": "timestamp"
+    },
+    "enabled": true,
+    "domain": "tech"
+  },
+  {
+    "name": "Meta",
+    "ats": "meta",
+    "career_site_url": "https://www.metacareers.com/jobsearch/",
+    "enabled": true,
+    "domain": "tech"
+  },
+  {
+    "name": "Apple",
+    "ats": "apple",
+    "career_site_url": "https://jobs.apple.com/en-in/search?location=india-INDC",
+    "location_code": "postLocation-INDC",
+    "locale": "en-in",
+    "enabled": true,
+    "domain": "tech"
+  },
+  {
+    "name": "Amazon",
+    "ats": "amazon",
+    "career_site_url": "https://www.amazon.jobs/en/search",
+    "api_url": "https://www.amazon.jobs/en/search.json",
+    "category": "software-development",
+    "country": "IND",
+    "sort": "recent",
     "enabled": true,
     "domain": "tech"
   },

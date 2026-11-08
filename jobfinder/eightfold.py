@@ -51,11 +51,18 @@ def build_job_url(company: dict, position_url: str) -> str:
     if position_url.startswith("http://") or position_url.startswith("https://"):
         return position_url
     
-    base_url = company.get("career_site_url")
-    if not base_url:
-        host = company.get("host")
-        subdomain = company.get("subdomain") or company.get("tenant")
-        base_url = f"https://{host}" if host else f"https://{subdomain}.eightfold.ai"
+    host = company.get("host")
+    if host:
+        base_url = f"https://{host}"
+    else:
+        base_url = company.get("career_site_url")
+        if base_url:
+            base_url = base_url.split("?")[0].rstrip("/")
+            if base_url.endswith("/careers") and position_url.startswith("/careers"):
+                base_url = base_url[:-len("/careers")]
+        else:
+            subdomain = company.get("subdomain") or company.get("tenant")
+            base_url = f"https://{subdomain}.eightfold.ai" if subdomain else "https://eightfold.ai"
     
     base = base_url.rstrip("/")
     path = position_url if position_url.startswith("/") else f"/{position_url}"
@@ -141,12 +148,34 @@ def fetch_company_jobs(
     Fetch all (or up to max_jobs) jobs from Eightfold.ai for a single company.
     """
     api_url = build_search_url(company)
-    domain_param = company.get("domain_param", f"{company.get('subdomain', '')}.com")
+    domain_param = (
+        company.get("domain_param")
+        or company.get("extra_params", {}).get("domain")
+        or f"{company.get('subdomain', '')}.com"
+    )
 
     all_jobs: List[dict] = []
     start = 0
     total_available = None
     page = 0
+
+    # Session warmup: Some Eightfold portals (e.g. Microsoft) require initial cookie handshake
+    warmup_url = company.get("warmup_url") or company.get("career_site_url")
+    if not warmup_url and company.get("host"):
+        warmup_url = f"https://{company['host']}/careers"
+
+    if warmup_url:
+        try:
+            session.get(
+                warmup_url,
+                headers={
+                    "User-Agent": EIGHTFOLD_HEADERS["User-Agent"],
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                },
+                timeout=15,
+            )
+        except Exception as e:
+            logger.debug(f"{company['name']}: Session warmup exception (continuing): {e}")
 
     logger.info(f"Fetching jobs from {company['name']} (Eightfold) → {api_url}")
 
@@ -160,7 +189,10 @@ def fetch_company_jobs(
             "query": filters.get("keyword", ""),
             "location": filters.get("location", ""),
             "start": start,
+            "num": PAGE_LIMIT,
         }
+        if company.get("extra_params"):
+            params.update(company["extra_params"])
 
         retries = 3
         response = None
