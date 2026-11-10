@@ -5,8 +5,9 @@ Endpoint: https://api.lever.co/v0/postings/{site_name}?mode=json
 """
 
 import logging
+import re
 from datetime import datetime, timezone
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 import requests
 
 logger = logging.getLogger(__name__)
@@ -57,7 +58,7 @@ def build_api_url(company: dict) -> str:
     return f"https://api.lever.co/v0/postings/{site_name}?mode=json"
 
 
-def parse_lever_date(created_at_ms: Optional[int]) -> tuple[str, Optional[int]]:
+def parse_lever_date(created_at_ms: Optional[int]) -> Tuple[str, Optional[int]]:
     """Parse Lever millisecond epoch timestamp and return (posted_on_str, posted_days_ago)."""
     if not created_at_ms:
         return "", None
@@ -151,8 +152,6 @@ def normalize_job(raw: dict, company: dict, filters: dict) -> dict:
     req_code = str(raw.get("reqCode") or "").strip()
     if req_code:
         job_id = req_code
-    elif len(raw_id) == 36 and "-" in raw_id:
-        job_id = raw_id[:8]
     else:
         job_id = raw_id
     job_url = raw.get("hostedUrl") or raw.get("applyUrl") or ""
@@ -183,19 +182,130 @@ def normalize_job(raw: dict, company: dict, filters: dict) -> dict:
     }
 
 
-def fetch_company_jobs(
+def fetch_nuvacore_jobs(
     company: dict,
     filters: dict,
     session: requests.Session,
     max_jobs: Optional[int] = None,
     posted_within_days: Optional[int] = None,
 ) -> dict:
-    """
-    Fetch and filter jobs for a Lever company.
+    """Fetch jobs directly from Nuvacore's career site with Lever API timestamps."""
+    logger.info("Fetching jobs from Nuvacore (nuvacore.ai/careers)")
+    # 1. Fetch Lever dates map
+    dates_map = {}
+    try:
+        r_lever = session.get("https://api.lever.co/v0/postings/nuvacore?mode=json", headers=LEVER_HEADERS, timeout=10)
+        if r_lever.status_code == 200:
+            for j in r_lever.json():
+                c_at = j.get("createdAt")
+                if c_at:
+                    dt = datetime.fromtimestamp(c_at / 1000.0, tz=timezone.utc)
+                    dates_map[j.get("id")] = (
+                        dt.strftime("%Y-%m-%d"),
+                        max(0, (datetime.now(timezone.utc) - dt).days),
+                    )
+    except Exception as e:
+        logger.debug(f"Could not load Nuvacore Lever timestamps: {e}")
 
-    Returns:
-        dict: Standardized fetch result dictionary.
-    """
+    # 2. Fetch nuvacore.ai/careers
+    try:
+        r_site = session.get(
+            "https://nuvacore.ai/careers",
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/120.0.0.0 Safari/537.36"
+                ),
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            },
+            timeout=15,
+        )
+        if r_site.status_code != 200:
+            raise RuntimeError(f"HTTP {r_site.status_code}")
+        cards = re.findall(r'<a class="group[^"]*" href="(/careers/[^"]+)">(.*?)</a>', r_site.text, re.DOTALL)
+        if not cards:
+            raise RuntimeError("No job cards found on nuvacore.ai/careers")
+    except Exception as e:
+        logger.warning(f"Failed to fetch nuvacore.ai/careers ({e}), falling back to Lever API.")
+        return fetch_company_jobs_standard(company, filters, session, max_jobs, posted_within_days)
+
+    loc_filter = (filters.get("location") or "").lower().strip()
+    kw_filter = (filters.get("keyword") or "").lower().strip()
+    synonyms = (
+        LOCATION_SYNONYMS.get("india", ["india", "bangalore", "bengaluru", "remote"])
+        if loc_filter in ("india", "in", "ind")
+        else [loc_filter]
+    )
+
+    all_jobs = []
+    for href, inner in cards:
+        title_m = re.search(r'<span class="text-h6[^"]*">([^<]+)</span>', inner)
+        dept_m = re.search(r'<span class="text-midnight">([^<]+)</span>', inner)
+        loc_m = re.search(r'<span class="text-midnight/64">([^<]+)</span>', inner)
+
+        title = title_m.group(1).replace("&amp;", "&").strip() if title_m else "Untitled"
+        dept = dept_m.group(1).strip() if dept_m else ""
+        raw_loc = loc_m.group(1).strip() if loc_m else ""
+
+        uuid_m = re.search(r'([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})', href)
+        job_id = uuid_m.group(1) if uuid_m else href.split("-")[-1]
+
+        loc_clean = raw_loc.split("·")[0].strip()
+
+        # Location filter
+        if loc_filter:
+            loc_l = loc_clean.lower()
+            if not any(s in loc_l for s in synonyms):
+                continue
+
+        # Keyword filter
+        if kw_filter and kw_filter not in title.lower():
+            continue
+
+        posted_on, posted_days = dates_map.get(job_id, ("", None))
+        remote_type = "Hybrid" if "hybrid" in raw_loc.lower() else ("Remote" if "remote" in raw_loc.lower() else "Onsite")
+
+        if posted_within_days is not None and posted_days is not None and posted_days > posted_within_days:
+            continue
+
+        all_jobs.append({
+            "company": company["name"],
+            "title": title,
+            "job_id": job_id,
+            "job_id_full": job_id,
+            "location": loc_clean,
+            "employment_type": dept,
+            "posted_on": posted_on,
+            "posted_days_ago": posted_days,
+            "url": f"https://nuvacore.ai{href}",
+            "external_path": href,
+            "remote_type": remote_type,
+            "source_ats": "lever",
+            "fetched_at": datetime.now(timezone.utc).isoformat(),
+            "_filters_applied": filters,
+        })
+        if max_jobs and len(all_jobs) >= max_jobs:
+            break
+
+    return {
+        "company": company["name"],
+        "success": True,
+        "error": None,
+        "total_available": len(cards),
+        "jobs_fetched": len(all_jobs),
+        "jobs": all_jobs,
+    }
+
+
+def fetch_company_jobs_standard(
+    company: dict,
+    filters: dict,
+    session: requests.Session,
+    max_jobs: Optional[int] = None,
+    posted_within_days: Optional[int] = None,
+) -> dict:
+    """Standard Lever postings fetcher."""
     api_url = build_api_url(company)
     logger.info(f"Fetching Lever jobs: {company['name']} -> {api_url}")
 
@@ -269,4 +379,18 @@ def fetch_company_jobs(
         "jobs_fetched": len(filtered_jobs),
         "jobs": filtered_jobs,
     }
+
+
+def fetch_company_jobs(
+    company: dict,
+    filters: dict,
+    session: requests.Session,
+    max_jobs: Optional[int] = None,
+    posted_within_days: Optional[int] = None,
+) -> dict:
+    """Entry point for fetching Lever jobs, with specialized handling for custom career pages."""
+    if company.get("name", "").lower() == "nuvacore":
+        return fetch_nuvacore_jobs(company, filters, session, max_jobs, posted_within_days)
+    return fetch_company_jobs_standard(company, filters, session, max_jobs, posted_within_days)
+
 

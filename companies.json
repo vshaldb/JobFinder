@@ -69,7 +69,8 @@
     "ats": "workday",
     "tenant": "workday",
     "datacenter": "wd5",
-    "site_name": "workdayprofessional",
+    "site_name": "Workday",
+    "career_site_url": "https://workday.wd5.myworkdayjobs.com/Workday/?source=Careers_Website",
     "enabled": true,
     "domain": "tech"
   },
@@ -77,8 +78,9 @@
     "name": "Procter & Gamble",
     "ats": "workday",
     "tenant": "pg",
-    "datacenter": "wd3",
-    "site_name": "ProcterGamble",
+    "datacenter": "wd5",
+    "site_name": "1000",
+    "career_site_url": "https://www.pgcareers.com/in/en/experienced#job-search-bar",
     "enabled": true,
     "domain": "consumer"
   },
@@ -137,8 +139,9 @@
     "name": "NXP Semiconductors",
     "ats": "workday",
     "tenant": "nxp",
-    "datacenter": "wd3",
+    "datacenter": "",
     "site_name": "careers",
+    "career_site_url": "https://nxp.myworkdayjobs.com/careers",
     "enabled": true,
     "domain": "semiconductor"
   },
@@ -450,7 +453,7 @@
     "name": "Nuvacore",
     "ats": "lever",
     "site_name": "nuvacore",
-    "career_site_url": "https://jobs.lever.co/nuvacore",
+    "career_site_url": "https://nuvacore.ai/careers#open-roles",
     "enabled": true,
     "domain": "semiconductor"
   },

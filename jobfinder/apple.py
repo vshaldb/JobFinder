@@ -243,3 +243,4 @@ def _error_result(company: dict, error: str, partial_jobs: list) -> dict:
         "jobs_fetched": len(partial_jobs),
         "jobs": partial_jobs,
     }
+

@@ -153,27 +153,31 @@ def job_within_days(posted_on: str, max_days: int) -> bool:
     return days_ago <= max_days
 
 
+def get_base_host(company: dict) -> str:
+    """Return the base domain for a Workday tenant."""
+    if company.get("host"):
+        return company["host"]
+    tenant = company["tenant"]
+    datacenter = (company.get("datacenter") or "").strip()
+    if datacenter:
+        return f"{tenant}.{datacenter}.myworkdayjobs.com"
+    return f"{tenant}.myworkdayjobs.com"
+
+
 def build_api_url(company: dict) -> str:
     """Construct the Workday CXS API endpoint from a company config dict."""
     tenant = company["tenant"]
-    datacenter = company["datacenter"]
     site_name = company["site_name"]
-    return (
-        f"https://{tenant}.{datacenter}.myworkdayjobs.com"
-        f"/wday/cxs/{tenant}/{site_name}/jobs"
-    )
+    host = get_base_host(company)
+    return f"https://{host}/wday/cxs/{tenant}/{site_name}/jobs"
 
 
 def build_job_url(company: dict, external_path: str) -> str:
     """Build the full URL to a specific job posting."""
-    tenant = company["tenant"]
-    datacenter = company["datacenter"]
     site_name = company["site_name"]
+    host = get_base_host(company)
     # external_path already starts with "/"
-    return (
-        f"https://{tenant}.{datacenter}.myworkdayjobs.com"
-        f"/{site_name}{external_path}"
-    )
+    return f"https://{host}/{site_name}{external_path}"
 
 
 def build_request_body(company: dict, filters: dict, offset: int) -> dict:
@@ -306,9 +310,9 @@ def _enrich_missing_posted_dates(company: dict, jobs: List[dict], session: reque
     from concurrent.futures import ThreadPoolExecutor
 
     tenant = company["tenant"]
-    datacenter = company["datacenter"]
     site_name = company["site_name"]
-    base_url = f"https://{tenant}.{datacenter}.myworkdayjobs.com/wday/cxs/{tenant}/{site_name}"
+    host = get_base_host(company)
+    base_url = f"https://{host}/wday/cxs/{tenant}/{site_name}"
 
     def fetch_detail(job: dict) -> None:
         ext_path = job.get("external_path", "")
@@ -377,9 +381,9 @@ def fetch_company_jobs(
 
     # Construct headers with proper Origin/Referer
     tenant = company["tenant"]
-    datacenter = company["datacenter"]
     site_name = company["site_name"]
-    base_url = f"https://{tenant}.{datacenter}.myworkdayjobs.com"
+    host = get_base_host(company)
+    base_url = f"https://{host}"
 
     headers = {
         **WORKDAY_HEADERS,
