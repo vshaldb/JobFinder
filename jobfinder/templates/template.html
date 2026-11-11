@@ -37,6 +37,24 @@
       padding: 0;
     }
 
+    /* Refined Modern Scrollbars */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+      transition: background 0.2s ease;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
     body {
       font-family: var(--font-family);
       background-color: var(--bg-primary);
@@ -92,12 +110,20 @@
     }
 
     .stat-badge {
-      background: var(--bg-primary);
+      background: var(--bg-surface);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      padding: 10px 16px;
+      padding: 10px 18px;
       text-align: center;
       min-width: 110px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .stat-badge:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: #cbd5e1;
     }
 
     .stat-badge .stat-value {
@@ -273,18 +299,31 @@
 
     .multiselect-menu {
       position: absolute;
-      top: calc(100% + 4px);
+      top: calc(100% + 6px);
       left: 0;
       right: 0;
       background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      box-shadow: var(--shadow-lg);
+      box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.12), 0 6px 12px -4px rgba(0, 0, 0, 0.05);
       z-index: 50;
       padding: 10px;
       max-height: 340px;
       display: flex;
       flex-direction: column;
+      animation: dropdownEnter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-origin: top center;
+    }
+
+    @keyframes dropdownEnter {
+      from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .multiselect-header {
@@ -510,11 +549,12 @@
       margin-bottom: 24px;
       box-shadow: var(--shadow-sm);
       overflow: hidden;
-      transition: box-shadow 0.2s ease;
+      transition: box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
     }
 
     .company-card:hover {
-      box-shadow: var(--shadow-md);
+      box-shadow: 0 8px 18px -4px rgba(0, 0, 0, 0.07), 0 4px 8px -4px rgba(0, 0, 0, 0.04);
+      border-color: #cbd5e1;
     }
 
     .company-header {
@@ -528,7 +568,7 @@
       gap: 12px;
       cursor: pointer;
       user-select: none;
-      transition: background 0.15s ease;
+      transition: background 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .company-header:hover {
@@ -536,7 +576,7 @@
     }
 
     .company-card.is-collapsed .company-header {
-      border-bottom: none;
+      border-bottom: 1px solid transparent;
     }
 
     .company-title-area {
@@ -558,25 +598,37 @@
       justify-content: center;
       color: var(--text-main);
       cursor: pointer;
-      transition: background 0.15s ease, transform 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
       flex-shrink: 0;
     }
 
     .company-collapse-btn:hover {
       background: #e2e8f0;
       color: var(--primary);
+      transform: scale(1.08);
     }
 
     .chevron-icon {
-      transition: transform 0.2s ease;
+      transition: transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .company-card.is-collapsed .chevron-icon {
       transform: rotate(-90deg);
     }
 
+    .company-body {
+      transition: max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.22s ease;
+      max-height: 15000px;
+      opacity: 1;
+      overflow: hidden;
+    }
+
     .company-card.is-collapsed .company-body {
-      display: none !important;
+      max-height: 0 !important;
+      opacity: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      pointer-events: none;
     }
 
     .company-name {
@@ -701,6 +753,15 @@
       padding: 12px 16px;
       border-bottom: 1px solid var(--border-color);
       white-space: nowrap;
+      transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  color 0.2s ease,
+                  border-bottom-color 0.2s ease;
+    }
+
+    th.th-sorted {
+      background: #eff6ff !important;
+      color: #1e40af !important;
+      border-bottom: 2px solid var(--primary) !important;
     }
 
     /* Column Header with Sort Button */
@@ -720,19 +781,22 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.15s ease;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .btn-sort:hover {
       background: #e2e8f0;
       color: var(--text-main);
+      transform: scale(1.08);
     }
 
     .btn-sort.sort-asc,
     .btn-sort.sort-desc {
-      background: var(--primary-subtle);
-      border-color: #bfdbfe;
-      color: var(--primary);
+      background: #dbeafe;
+      border-color: #93c5fd;
+      color: #1d4ed8;
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
+      transform: scale(1.05);
     }
 
     .btn-sort .icon-asc,
@@ -751,14 +815,27 @@
       border-bottom: 1px solid var(--border-color);
       color: var(--text-main);
       vertical-align: middle;
+      transition: background-color 0.18s ease;
     }
 
     tr.job-row:last-child td {
       border-bottom: none;
     }
 
+    tr.job-row {
+      transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-left-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      border-left: 3px solid transparent;
+    }
+
     tr.job-row:hover {
       background-color: #f8fafc;
+      border-left-color: var(--primary);
+    }
+
+    tr.job-row:hover .role-name {
+      color: var(--primary);
+      transition: color 0.15s ease;
     }
 
     .col-sno {
@@ -775,6 +852,7 @@
 
     .role-name {
       color: var(--text-main);
+      transition: color 0.15s ease;
     }
 
     .highlight {
@@ -795,6 +873,12 @@
       padding: 2px 6px;
       border-radius: 4px;
       border: 1px solid #e2e8f0;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    tr.job-row:hover .col-jobid code {
+      background: #e2e8f0;
+      border-color: #cbd5e1;
     }
 
     .col-location {
@@ -844,12 +928,19 @@
       border-radius: var(--radius-sm);
       font-size: 13px;
       font-weight: 600;
-      transition: background 0.15s ease-in-out, transform 0.1s ease;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 1px 2px rgba(37, 99, 235, 0.18);
     }
 
     .btn-apply:hover {
       background: var(--primary-hover);
       transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.28);
+    }
+
+    .btn-apply:active {
+      transform: translateY(0);
+      box-shadow: none;
     }
 
     .badge-applied {
@@ -865,6 +956,8 @@
       font-weight: 700;
       letter-spacing: 0.2px;
       user-select: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 2px rgba(16, 185, 129, 0.15);
     }
 
     .btn-toggle-apply {
@@ -880,13 +973,18 @@
       padding: 5px 8px;
       font-size: 11px;
       font-weight: 600;
-      transition: all 0.15s ease;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .btn-mark-apply:hover {
       border-color: #10b981;
       color: #059669;
       background: #ecfdf5;
+      transform: translateY(-1px);
+    }
+
+    .btn-mark-apply:active {
+      transform: translateY(0);
     }
 
     .btn-unmark-apply {
@@ -900,6 +998,7 @@
       color: #ef4444;
       background: #fee2e2;
       border-color: #fca5a5;
+      transform: scale(1.08);
     }
 
     .stat-badge.stat-applied .stat-value {
@@ -918,22 +1017,36 @@
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .btn-toggle-applied:hover {
       background: #f1f5f9;
       border-color: var(--border-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-toggle-applied:active {
+      transform: translateY(0);
+      box-shadow: none;
     }
 
     .btn-toggle-applied.is-active {
       background: #f0fdf4;
       border-color: #86efac;
       color: #166534;
+      box-shadow: 0 1px 3px rgba(34, 197, 94, 0.15);
     }
 
     tr.job-row.row-applied {
-      background-color: #fbfdfc;
+      background-color: #f7fdfa;
+      border-left: 3px solid #10b981;
+    }
+
+    tr.job-row.row-applied:hover {
+      background-color: #edfbf2 !important;
+      border-left-color: #059669;
     }
 
     /* Toast Notification */
@@ -941,10 +1054,31 @@
       position: fixed;
       bottom: 24px;
       right: 24px;
-      background: #0f172a;
+      background: rgba(15, 23, 42, 0.94);
       color: #ffffff;
-      padding: 12px 18px;
+      padding: 12px 20px;
       border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18), 0 4px 8px rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0;
+      transform: translateY(16px) scale(0.96);
+      pointer-events: none;
+    }
+
+    #jobfinder-toast.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
       font-size: 13px;
       font-weight: 500;
       box-shadow: var(--shadow-lg);
@@ -1793,24 +1927,60 @@
             e.stopPropagation();
             const sortKey = btn.getAttribute('data-sort'); // 'company', 'title', 'location', 'date'
 
-            // Determine next state: none -> asc -> desc -> none
-            // (or none -> desc -> asc -> none for date: desc=newest first)
-            let nextOrder = 'asc';
-            if (btn.classList.contains('sort-asc')) {
-              nextOrder = 'desc';
-            } else if (btn.classList.contains('sort-desc')) {
-              nextOrder = 'none';
+            // Determine next state:
+            // For date: none -> desc (newest first) -> asc (oldest first) -> none (original)
+            // For text: none -> asc (A-Z) -> desc (Z-A) -> none (original)
+            let nextOrder = 'none';
+            if (sortKey === 'date') {
+              if (btn.classList.contains('sort-desc')) {
+                nextOrder = 'asc';   // Second click: Oldest first
+              } else if (btn.classList.contains('sort-asc')) {
+                nextOrder = 'none';  // Third click: Reset order
+              } else {
+                nextOrder = 'desc';  // First click: Newest first
+              }
             } else {
-              nextOrder = (sortKey === 'date') ? 'desc' : 'asc';
+              if (btn.classList.contains('sort-asc')) {
+                nextOrder = 'desc';  // Second click: Z to A
+              } else if (btn.classList.contains('sort-desc')) {
+                nextOrder = 'none';  // Third click: Reset order
+              } else {
+                nextOrder = 'asc';   // First click: A to Z
+              }
             }
 
-            // Reset all sort buttons in this table
+            // Reset all header active states and sort buttons in this table
+            card.querySelectorAll('th').forEach(th => th.classList.remove('th-sorted', 'th-sorted-asc', 'th-sorted-desc'));
             sortButtons.forEach(b => {
               b.classList.remove('sort-asc', 'sort-desc');
+              const sk = b.getAttribute('data-sort');
+              if (sk === 'date') {
+                b.title = 'Sort by Posted Date (Newest / Oldest)';
+              } else if (sk === 'company') {
+                b.title = 'Sort by Company (A-Z / Z-A)';
+              } else if (sk === 'title') {
+                b.title = 'Sort by Role Name (A-Z / Z-A)';
+              } else if (sk === 'location') {
+                b.title = 'Sort by Location (A-Z / Z-A)';
+              }
             });
 
+            const parentTh = btn.closest('th');
             if (nextOrder !== 'none') {
               btn.classList.add(nextOrder === 'asc' ? 'sort-asc' : 'sort-desc');
+              if (parentTh) {
+                parentTh.classList.add('th-sorted', nextOrder === 'asc' ? 'th-sorted-asc' : 'th-sorted-desc');
+              }
+              // Update tooltip
+              if (sortKey === 'date') {
+                btn.title = nextOrder === 'desc'
+                  ? 'Sorted: Newest First (Click for Oldest First)'
+                  : 'Sorted: Oldest First (Click to Reset)';
+              } else {
+                btn.title = nextOrder === 'asc'
+                  ? 'Sorted: A to Z (Click for Z to A)'
+                  : 'Sorted: Z to A (Click to Reset)';
+              }
             }
 
             // Sort rows
@@ -1847,16 +2017,41 @@
               });
             } else if (sortKey === 'date') {
               rows.sort((a, b) => {
-                // data-days: smaller days = newer
                 const daysA = parseInt(a.getAttribute('data-days') || '999999', 10);
                 const daysB = parseInt(b.getAttribute('data-days') || '999999', 10);
+                const hasA = !isNaN(daysA) && daysA < 900000;
+                const hasB = !isNaN(daysB) && daysB < 900000;
+
+                // Jobs with unknown / missing date always placed at the end
+                if (hasA && !hasB) return -1;
+                if (!hasA && hasB) return 1;
+                if (!hasA && !hasB) {
+                  const idxA = parseInt(a.getAttribute('data-orig-idx') || '0', 10);
+                  const idxB = parseInt(b.getAttribute('data-orig-idx') || '0', 10);
+                  return idxA - idxB;
+                }
+
+                // If days differ:
+                // nextOrder === 'desc': Newest first (smaller daysAgo first: 0, 1, 2, ... 30, 60)
+                // nextOrder === 'asc':  Oldest first (larger daysAgo first: 60, 30, ... 2, 1, 0)
                 if (daysA !== daysB) {
                   return nextOrder === 'desc' ? (daysA - daysB) : (daysB - daysA);
                 }
-                const dateA = a.getAttribute('data-date') || '';
-                const dateB = b.getAttribute('data-date') || '';
-                const cmp = dateA.localeCompare(dateB);
-                return nextOrder === 'desc' ? -cmp : cmp;
+
+                // Deterministic secondary sort: by company name, then title, then orig-idx
+                const compA = (a.getAttribute('data-company') || '').toLowerCase();
+                const compB = (b.getAttribute('data-company') || '').toLowerCase();
+                if (compA !== compB) {
+                  return compA.localeCompare(compB);
+                }
+                const titleA = (a.getAttribute('data-title') || '').toLowerCase();
+                const titleB = (b.getAttribute('data-title') || '').toLowerCase();
+                if (titleA !== titleB) {
+                  return titleA.localeCompare(titleB);
+                }
+                const idxA = parseInt(a.getAttribute('data-orig-idx') || '0', 10);
+                const idxB = parseInt(b.getAttribute('data-orig-idx') || '0', 10);
+                return idxA - idxB;
               });
             }
 
@@ -1895,6 +2090,9 @@
         // Reset sort buttons across all tables
         document.querySelectorAll('.btn-sort').forEach(b => {
           b.classList.remove('sort-asc', 'sort-desc');
+        });
+        document.querySelectorAll('th').forEach(th => {
+          th.classList.remove('th-sorted', 'th-sorted-asc', 'th-sorted-desc');
         });
 
         // Restore original row orders across all tables

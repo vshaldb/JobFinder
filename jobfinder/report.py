@@ -193,6 +193,12 @@ def build_merged_section(
             location = job.get("location", "Not specified")
             posted_on = job.get("posted_on", "")
             posted_days = job.get("posted_days_ago")
+            if posted_days is None and posted_on:
+                try:
+                    dt = datetime.strptime(str(posted_on).strip()[:10], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                    posted_days = max(0, (datetime.now(timezone.utc) - dt).days)
+                except Exception:
+                    pass
             url = job.get("url", "#")
             loc_tags = get_location_tags(location)
             loc_tags_attr = "|".join(loc_tags)
@@ -475,6 +481,12 @@ def generate_html_report(
                 location = job.get("location", "Not specified")
                 posted_on = job.get("posted_on", "")
                 posted_days = job.get("posted_days_ago")
+                if posted_days is None and posted_on:
+                    try:
+                        dt = datetime.strptime(str(posted_on).strip()[:10], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                        posted_days = max(0, (datetime.now(timezone.utc) - dt).days)
+                    except Exception:
+                        pass
                 url = job.get("url", "#")
                 loc_tags = get_location_tags(location)
                 loc_tags_attr = "|".join(loc_tags)
@@ -501,6 +513,7 @@ def generate_html_report(
 
                 rows_html.append(
                     f'<tr class="job-row{row_applied_cls}" '
+                    f'data-company="{html.escape(comp_name, quote=True)}" '
                     f'data-title="{html.escape(title, quote=True)}" '
                     f'data-location="{html.escape(location, quote=True)}" '
                     f'data-loc-tags="{html.escape(loc_tags_attr, quote=True)}" '

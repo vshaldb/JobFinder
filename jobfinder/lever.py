@@ -152,6 +152,8 @@ def normalize_job(raw: dict, company: dict, filters: dict) -> dict:
     req_code = str(raw.get("reqCode") or "").strip()
     if req_code:
         job_id = req_code
+    elif "-" in raw_id:
+        job_id = raw_id.split("-")[0]
     else:
         job_id = raw_id
     job_url = raw.get("hostedUrl") or raw.get("applyUrl") or ""
@@ -249,7 +251,9 @@ def fetch_nuvacore_jobs(
         raw_loc = loc_m.group(1).strip() if loc_m else ""
 
         uuid_m = re.search(r'([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})', href)
-        job_id = uuid_m.group(1) if uuid_m else href.split("-")[-1]
+        full_uuid = uuid_m.group(1) if uuid_m else href.split("-")[-1]
+        # Extract only the first part of the string before the hyphen for a clean, short job ID
+        short_id = full_uuid.split("-")[0] if "-" in full_uuid else full_uuid
 
         loc_clean = raw_loc.split("·")[0].strip()
 
@@ -263,7 +267,7 @@ def fetch_nuvacore_jobs(
         if kw_filter and kw_filter not in title.lower():
             continue
 
-        posted_on, posted_days = dates_map.get(job_id, ("", None))
+        posted_on, posted_days = dates_map.get(full_uuid, ("", None))
         remote_type = "Hybrid" if "hybrid" in raw_loc.lower() else ("Remote" if "remote" in raw_loc.lower() else "Onsite")
 
         if posted_within_days is not None and posted_days is not None and posted_days > posted_within_days:
@@ -272,8 +276,8 @@ def fetch_nuvacore_jobs(
         all_jobs.append({
             "company": company["name"],
             "title": title,
-            "job_id": job_id,
-            "job_id_full": job_id,
+            "job_id": short_id,
+            "job_id_full": full_uuid,
             "location": loc_clean,
             "employment_type": dept,
             "posted_on": posted_on,
