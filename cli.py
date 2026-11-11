@@ -37,6 +37,11 @@ Usage examples
   # Combine filters
   python cli.py fetch --keyword "VLSI" --domain semiconductor --posted-within 14 --max-jobs 10
 
+  # Parallel fetching with custom worker threads (default: 8, 1 = sequential)
+  python cli.py fetch --workers 10
+  python cli.py fetch -w 4
+  python cli.py fetch --workers 1
+
   # List configured companies
   python cli.py companies
 
@@ -47,6 +52,7 @@ Usage examples
 import json
 import logging
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -203,6 +209,19 @@ def cli() -> None:
     type=click.Path(path_type=Path),
     help="Directory to write output JSON (default: job_data/).",
 )
+@click.option(
+    "--workers", "-w",
+    default=8,
+    show_default=True,
+    type=int,
+    help="Number of concurrent worker threads for parallel fetching (1 = sequential).",
+)
+@click.option(
+    "--concurrency",
+    default=None,
+    type=int,
+    help="Alias for --workers / -w.",
+)
 @click.option("--verbose", "-v", is_flag=True, help="Enable verbose/debug logging.")
 def fetch(
     keyword: str,
@@ -217,6 +236,8 @@ def fetch(
     max_jobs: int,
     companies_file: Optional[Path],
     output_dir: Optional[Path],
+    workers: int,
+    concurrency: Optional[int],
     verbose: bool,
 ) -> None:
     """Fetch job postings across corporate career portals."""
@@ -265,12 +286,19 @@ def fetch(
         )
         sys.exit(1)
 
+    # Resolve effective concurrency
+    if concurrency is not None:
+        workers = concurrency
+    effective_workers = max(1, workers)
+    num_workers = min(effective_workers, len(target_companies))
+    worker_label = f"{num_workers} parallel workers" if num_workers > 1 else "sequential mode"
+
     # ── Display run summary ───────────────────────────────────────────────
     console.print()
     console.print(
         Panel.fit(
             f"[bold cyan]JobFinder[/bold cyan]  —  Careers Portal Fetcher\n"
-            f"[dim]Fetching from {len(target_companies)} company/ies across ATS platforms[/dim]",
+            f"[dim]Fetching from {len(target_companies)} company/ies across ATS platforms ({worker_label})[/dim]",
             border_style="cyan",
         )
     )
@@ -294,67 +322,91 @@ def fetch(
                 console.print(f"  [green]{label}[/green]: {v} days")
             else:
                 console.print(f"  [green]{label}[/green]: {v}")
+        console.print(f"  [green]Workers (Parallel)[/green]: {num_workers} threads")
     else:
-        console.print("\n[dim]No filters applied — fetching all available jobs.[/dim]")
+        console.print(f"\n[dim]No filters applied — fetching all available jobs ({worker_label}).[/dim]")
     console.print()
 
     # ── Run fetches ───────────────────────────────────────────────────────
     run_started_at = datetime.utcnow().isoformat() + "Z"
-    results = []
+    results = [None] * len(target_companies)
 
-    with requests.Session() as session:
-        with Progress(
-            SpinnerColumn(),
-            TextColumn("[bold]{task.description}"),
-            BarColumn(),
-            MofNCompleteColumn(),
-            TaskProgressColumn(),
-            TimeElapsedColumn(),
-            console=console,
-            transient=False,
-        ) as progress:
-            overall = progress.add_task(
-                "Overall", total=len(target_companies)
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[bold]{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        TaskProgressColumn(),
+        TimeElapsedColumn(),
+        console=console,
+        transient=False,
+    ) as progress:
+        overall = progress.add_task(
+            "Overall", total=len(target_companies)
+        )
+
+        def fetch_worker(idx: int, comp: dict):
+            task = progress.add_task(
+                f"[cyan]{comp['name']}[/cyan] [dim]({comp.get('ats', '')})[/dim]",
+                total=None,
             )
+            try:
+                with requests.Session() as session:
+                    res = fetch_jobs_for_company(
+                        company=comp,
+                        filters=filters_clean,
+                        session=session,
+                        max_jobs=max_jobs if max_jobs > 0 else None,
+                        posted_within_days=posted_within_days,
+                    )
+                res["ats"] = comp.get("ats", "")
+            except Exception as e:
+                logger.exception(f"Unhandled exception fetching {comp['name']}: {e}")
+                res = {
+                    "company": comp["name"],
+                    "ats": comp.get("ats", ""),
+                    "success": False,
+                    "error": str(e),
+                    "total_available": 0,
+                    "jobs_fetched": 0,
+                    "jobs": [],
+                }
 
-            for company in target_companies:
-                task = progress.add_task(
-                    f"[cyan]{company['name']}[/cyan] [dim]({company.get('ats', '')})[/dim]",
-                    total=None,
+            if res.get("success"):
+                progress.update(
+                    task,
+                    description=(
+                        f"[green]✓ {comp['name']}[/green] "
+                        f"({res.get('jobs_fetched', 0)} jobs)"
+                    ),
+                    completed=res.get("jobs_fetched", 0),
+                    total=res.get("total_available") or res.get("jobs_fetched", 0),
+                )
+            else:
+                progress.update(
+                    task,
+                    description=(
+                        f"[red]✗ {comp['name']}[/red] "
+                        f"— {res.get('error', 'Unknown error')}"
+                    ),
+                    completed=0,
+                    total=1,
                 )
 
-                result = fetch_jobs_for_company(
-                    company=company,
-                    filters=filters_clean,
-                    session=session,
-                    max_jobs=max_jobs if max_jobs > 0 else None,
-                    posted_within_days=posted_within_days,
-                )
-                result["ats"] = company.get("ats", "")
-                results.append(result)
+            progress.advance(overall)
+            return idx, res
 
-                if result["success"]:
-                    progress.update(
-                        task,
-                        description=(
-                            f"[green]✓ {company['name']}[/green] "
-                            f"({result['jobs_fetched']} jobs)"
-                        ),
-                        completed=result["jobs_fetched"],
-                        total=result["total_available"] or result["jobs_fetched"],
-                    )
-                else:
-                    progress.update(
-                        task,
-                        description=(
-                            f"[red]✗ {company['name']}[/red] "
-                            f"— {result['error']}"
-                        ),
-                        completed=0,
-                        total=1,
-                    )
+        with ThreadPoolExecutor(max_workers=num_workers) as executor:
+            futures = [
+                executor.submit(fetch_worker, idx, comp)
+                for idx, comp in enumerate(target_companies)
+            ]
+            for future in as_completed(futures):
+                idx, res = future.result()
+                results[idx] = res
 
-                progress.advance(overall)
+    # Filter out any unexpected None values
+    results = [r for r in results if r is not None]
 
     # ── Save output ───────────────────────────────────────────────────────
     out_dir = save_results(

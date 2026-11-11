@@ -193,6 +193,13 @@ python cli.py fetch --domain semiconductor --posted-within 7
 
 # Limit jobs fetched per company for quick checks
 python cli.py fetch --company "ARM,Astera Labs" --max-jobs 5
+
+# High-speed parallel fetching (default: 8 worker threads)
+python cli.py fetch --workers 10
+# Or using the short flag
+python cli.py fetch -w 12
+# Run sequentially (single thread)
+python cli.py fetch --workers 1
 ```
 
 ---
