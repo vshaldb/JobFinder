@@ -343,6 +343,131 @@ def fetch_talentbrew_icims_jobs(
     }
 
 
+def _extract_standard_location_values(html_content: str, target_location: str) -> List[str]:
+    """Match target location against <select name='searchLocation'> option labels."""
+    if not target_location:
+        return []
+    m = re.search(
+        r'<select[^>]*name=["\']searchLocation["\'][^>]*>(.*?)</select>',
+        html_content,
+        re.S | re.I,
+    )
+    if not m:
+        return []
+
+    target_clean = target_location.lower().strip()
+    synonyms = LOCATION_SYNONYMS.get(target_clean, [target_clean])
+    matched_vals: List[str] = []
+
+    for val, label_raw in re.findall(
+        r'<option[^>]*value=["\']([^"\']*)["\'][^>]*>(.*?)</option>',
+        m.group(1),
+        re.S | re.I,
+    ):
+        val = val.strip()
+        if not val or val == "zipRadius":
+            continue
+        label_clean = re.sub(r"<[^>]+>", " ", html.unescape(label_raw)).strip().lower()
+        is_ind_prefix = label_clean.startswith("in-") or label_clean.startswith("ind-")
+        if (
+            target_clean in label_clean
+            or any(syn in label_clean for syn in synonyms)
+            or (target_clean == "india" and is_ind_prefix)
+        ):
+            matched_vals.append(val)
+
+    return matched_vals
+
+
+def _parse_standard_job_cards(html_content: str, portal_host: str, fallback_location: str) -> List[dict]:
+    """Parse iCIMS job cards (iCIMS_JobCardItem) or fallback links from search HTML."""
+    cards = re.findall(
+        r'<li[^>]*class=["\'][^"\']*iCIMS_JobCardItem[^"\']*["\'][^>]*>(.*?)</li>',
+        html_content,
+        re.S | re.I,
+    )
+
+    parsed: List[dict] = []
+    if cards:
+        for card in cards:
+            a_match = re.search(
+                r'<a[^>]*href=["\']([^"\']*/jobs/(\d+)/[^"\']*)["\'][^>]*>(.*?)</a>',
+                card,
+                re.S | re.I,
+            )
+            if not a_match:
+                continue
+            href, url_jid, title_raw = a_match.groups()
+            title_no_sr = re.sub(r'<span[^>]*class=["\'][^"\']*sr-only[^"\']*["\'][^>]*>.*?</span>', "", title_raw, flags=re.S | re.I)
+            title = html.unescape(re.sub(r"<[^>]+>", " ", title_no_sr)).strip()
+            title = re.sub(r"\s+", " ", title)
+            if not title or title.lower() in ("apply", "apply now", "view job"):
+                continue
+
+            loc_match = re.search(
+                r'(?:Job\s+Locations?|Location\s*:\s*Location)</span>\s*<span[^>]*>(.*?)</span>',
+                card,
+                re.S | re.I,
+            )
+            loc_str = html.unescape(re.sub(r"<[^>]+>", " ", loc_match.group(1))).strip() if loc_match else (fallback_location or "Multiple Locations")
+            loc_str = re.sub(r"\s+", " ", loc_str)
+
+            jid_match = re.search(
+                r'<dt[^>]*>\s*Job\s*ID\s*</dt>\s*<dd[^>]*>(.*?)</dd>',
+                card,
+                re.S | re.I,
+            )
+            display_jid = html.unescape(re.sub(r"<[^>]+>", "", jid_match.group(1))).strip() if jid_match else url_jid
+            if not display_jid:
+                display_jid = url_jid
+
+            cat_match = re.search(
+                r'<dt[^>]*>\s*(?:Job\s*Category|Category)\s*</dt>\s*<dd[^>]*>(.*?)</dd>',
+                card,
+                re.S | re.I,
+            )
+            category = html.unescape(re.sub(r"<[^>]+>", " ", cat_match.group(1))).strip() if cat_match else "Full-Time"
+
+            clean_href = href.split("?")[0]
+            full_job_url = f"{portal_host}{clean_href}" if clean_href.startswith("/") else clean_href
+
+            parsed.append({
+                "title": title,
+                "job_id": display_jid,
+                "url_job_id": url_jid,
+                "location": loc_str,
+                "employment_type": category or "Full-Time",
+                "url": full_job_url,
+                "external_path": clean_href,
+            })
+        return parsed
+
+    # Fallback regex for portals without iCIMS_JobCardItem wrappers
+    job_links = re.findall(
+        r'<a[^>]*href=["\']([^"\']*/jobs/(\d+)/[^"\']*)["\'][^>]*>(.*?)</a>',
+        html_content,
+        re.S | re.I,
+    )
+    for href, url_jid, title_raw in job_links:
+        title_no_sr = re.sub(r'<span[^>]*class=["\'][^"\']*sr-only[^"\']*["\'][^>]*>.*?</span>', "", title_raw, flags=re.S | re.I)
+        title = html.unescape(re.sub(r"<[^>]+>", " ", title_no_sr)).strip()
+        title = re.sub(r"\s+", " ", title)
+        if not title or title.lower() in ("apply", "apply now", "view job"):
+            continue
+        clean_href = href.split("?")[0]
+        full_job_url = f"{portal_host}{clean_href}" if clean_href.startswith("/") else clean_href
+        parsed.append({
+            "title": title,
+            "job_id": url_jid,
+            "url_job_id": url_jid,
+            "location": fallback_location or "Multiple Locations",
+            "employment_type": "Full-Time",
+            "url": full_job_url,
+            "external_path": clean_href,
+        })
+    return parsed
+
+
 def fetch_standard_icims_jobs(
     company: dict,
     filters: dict,
@@ -353,107 +478,155 @@ def fetch_standard_icims_jobs(
     """
     Fetch jobs from standard iCIMS portal: https://{subdomain}.icims.com/jobs/search?in_iframe=1
     """
+    from concurrent.futures import ThreadPoolExecutor
+
     subdomain = company.get("subdomain") or company.get("tenant")
-    portal_host = f"https://{subdomain}.icims.com" if "://" not in subdomain else subdomain.rstrip("/")
+    portal_host = f"https://{subdomain}.icims.com" if "://" not in str(subdomain) else str(subdomain).rstrip("/")
     search_endpoint = f"{portal_host}/jobs/search"
 
     keyword_filter = filters.get("keyword", "")
-    location_filter = filters.get("location", "")
+    location_filter = (filters.get("location") or "").strip()
 
-    page = 0
-    matched_jobs: List[dict] = []
-    total_available = 0
-    max_pages = 25
-
-    while page < max_pages:
-        params = {
-            "in_iframe": "1",
-            "pr": str(page),
-            "searchKeyword": keyword_filter,
-            "searchLocation": location_filter,
+    # Probe page 0 to read location dropdown option values
+    try:
+        init_resp = session.get(
+            search_endpoint,
+            params={"in_iframe": "1", "pr": "0", "searchKeyword": keyword_filter},
+            headers=ICIMS_HEADERS,
+            timeout=25,
+        )
+        init_resp.raise_for_status()
+        init_html = init_resp.text
+    except requests.exceptions.RequestException as e:
+        err = f"Request error on initial page: {e}"
+        logger.error(f"{company['name']}: {err}")
+        return {
+            "company": company["name"],
+            "success": False,
+            "error": err,
+            "total_available": 0,
+            "jobs_fetched": 0,
+            "jobs": [],
         }
 
-        try:
-            resp = session.get(search_endpoint, params=params, headers=ICIMS_HEADERS, timeout=25)
-            resp.raise_for_status()
-            html_content = resp.text
-        except requests.exceptions.RequestException as e:
-            err = f"Request error on page {page}: {e}"
-            logger.error(f"{company['name']}: {err}")
-            if not matched_jobs:
-                return {
-                    "company": company["name"],
-                    "success": False,
-                    "error": err,
-                    "total_available": 0,
-                    "jobs_fetched": 0,
-                    "jobs": [],
+    search_loc_values = _extract_standard_location_values(init_html, location_filter)
+    # If location filter was requested and dropdown didn't match any option, iterate unfiltered pages
+    loc_queries: List[Optional[str]] = search_loc_values if search_loc_values else [None]
+
+    matched_jobs: List[dict] = []
+    seen_ids = set()
+    max_pages = 25
+
+    for loc_val in loc_queries:
+        page = 0
+        while page < max_pages:
+            if page == 0 and loc_val is None:
+                html_content = init_html
+            else:
+                params = {
+                    "in_iframe": "1",
+                    "pr": str(page),
+                    "searchKeyword": keyword_filter,
                 }
-            break
+                if loc_val:
+                    params["searchLocation"] = loc_val
+                try:
+                    resp = session.get(search_endpoint, params=params, headers=ICIMS_HEADERS, timeout=25)
+                    resp.raise_for_status()
+                    html_content = resp.text
+                except requests.exceptions.RequestException as e:
+                    err = f"Request error on page {page}: {e}"
+                    logger.error(f"{company['name']}: {err}")
+                    if not matched_jobs:
+                        return {
+                            "company": company["name"],
+                            "success": False,
+                            "error": err,
+                            "total_available": 0,
+                            "jobs_fetched": 0,
+                            "jobs": [],
+                        }
+                    break
 
-        # Search for job links e.g. href="/jobs/1234/software-engineer/job"
-        job_links = re.findall(
-            r'<a[^>]*class=[\"\'][^\"\']*iCIMS_Anchor[^\"]*[\"\'][^>]*href=[\"\']([^\"\']*/jobs/(\d+)/[^\"\']*)[\"\'][^>]*>(.*?)</a>',
-            html_content,
-            re.S | re.I,
-        )
-        if not job_links:
-            # Fallback regex for standard link pattern
-            job_links = re.findall(
-                r'<a[^>]*href=[\"\']([^\"\']*/jobs/(\d+)/[^\"\']*)[\"\'][^>]*>(.*?)</a>',
-                html_content,
-                re.S | re.I,
-            )
-
-        if not job_links:
-            break
-
-        total_available += len(job_links)
-
-        for href, job_id, title_raw in job_links:
-            title = re.sub(r"<[^>]+>", "", title_raw)
-            title = html.unescape(title).strip()
-            if not title or title.lower() in ("apply", "apply now", "view job"):
-                continue
-
-            full_job_url = f"{portal_host}{href}" if href.startswith("/") else href
-
-            # Keyword filter
-            if not matches_keyword(title, keyword_filter):
-                continue
-
-            job_entry = {
-                "company": company["name"],
-                "title": title,
-                "job_id": job_id,
-                "location": location_filter or "Multiple Locations",
-                "employment_type": "Full-Time",
-                "posted_on": "",
-                "posted_days_ago": None,
-                "url": full_job_url,
-                "external_path": href,
-                "remote_type": "",
-                "source_ats": "icims",
-                "fetched_at": datetime.now(timezone.utc).isoformat(),
-                "_filters_applied": filters,
-            }
-            matched_jobs.append(job_entry)
-
-            if max_jobs and len(matched_jobs) >= max_jobs:
+            cards = _parse_standard_job_cards(html_content, portal_host, location_filter)
+            if not cards:
                 break
 
-        if max_jobs and len(matched_jobs) >= max_jobs:
+            for card in cards:
+                jid = card["job_id"]
+                if jid in seen_ids:
+                    continue
+                if not matches_keyword(card["title"], keyword_filter):
+                    continue
+                if location_filter and not loc_val:
+                    # Fallback client-side check when dropdown option wasn't resolved
+                    card_loc_clean = card["location"].lower()
+                    is_ind_code = card_loc_clean.startswith("in-") or card_loc_clean.startswith("ind-")
+                    if not (matches_location(card["location"], location_filter) or (location_filter.lower() == "india" and is_ind_code)):
+                        continue
+
+                seen_ids.add(jid)
+                matched_jobs.append({
+                    "company": company["name"],
+                    "title": card["title"],
+                    "job_id": jid,
+                    "location": card["location"],
+                    "employment_type": card["employment_type"],
+                    "posted_on": "",
+                    "posted_days_ago": None,
+                    "url": card["url"],
+                    "external_path": card["external_path"],
+                    "remote_type": "Remote" if "remote" in card["location"].lower() else "",
+                    "source_ats": "icims",
+                    "fetched_at": datetime.now(timezone.utc).isoformat(),
+                    "_filters_applied": filters,
+                })
+
+            page_match = re.search(r"Page\s+(\d+)\s+of\s+(\d+)", html_content, re.I)
+            if page_match and int(page_match.group(1)) >= int(page_match.group(2)):
+                break
+
+            if max_jobs and not posted_within_days and len(matched_jobs) >= max_jobs:
+                break
+
+            page += 1
+
+        if max_jobs and not posted_within_days and len(matched_jobs) >= max_jobs:
             break
 
-        page += 1
+    total_available = len(matched_jobs)
+    if max_jobs and not posted_within_days and len(matched_jobs) > max_jobs:
+        matched_jobs = matched_jobs[:max_jobs]
+
+    # Enrich posted dates from job detail JSON-LD concurrently
+    def enrich_detail(job_item: dict) -> None:
+        detail_url = job_item["url"]
+        sep = "&" if "?" in detail_url else "?"
+        date_str, days_ago, _ = fetch_job_detail_info(session, f"{detail_url}{sep}in_iframe=1")
+        if date_str:
+            job_item["posted_on"] = date_str
+            job_item["posted_days_ago"] = days_ago
+
+    if matched_jobs:
+        with ThreadPoolExecutor(max_workers=min(len(matched_jobs), 8)) as executor:
+            list(executor.map(enrich_detail, matched_jobs))
+
+    final_jobs: List[dict] = []
+    for job_item in matched_jobs:
+        if posted_within_days is not None and posted_within_days > 0:
+            if job_item["posted_days_ago"] is not None and job_item["posted_days_ago"] > posted_within_days:
+                continue
+        final_jobs.append(job_item)
+        if max_jobs and len(final_jobs) >= max_jobs:
+            break
 
     return {
         "company": company["name"],
         "success": True,
         "error": None,
-        "total_available": total_available if total_available > 0 else len(matched_jobs),
-        "jobs_fetched": len(matched_jobs),
-        "jobs": matched_jobs,
+        "total_available": total_available,
+        "jobs_fetched": len(final_jobs),
+        "jobs": final_jobs,
     }
 
 
@@ -643,6 +816,14 @@ def fetch_company_jobs(
 
     if portal_type == "jibe" or company.get("api_url") or "amd" in company.get("name", "").lower():
         return fetch_jibe_icims_jobs(
+            company=company,
+            filters=filters,
+            session=session,
+            max_jobs=max_jobs,
+            posted_within_days=posted_within_days,
+        )
+    elif portal_type == "standard":
+        return fetch_standard_icims_jobs(
             company=company,
             filters=filters,
             session=session,

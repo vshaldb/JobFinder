@@ -1,6 +1,6 @@
 # JobFinder 🔍
 
-A high-performance command-line careers crawler, data normalizer, and interactive dashboard that fetches real-time job openings from corporate career portals across **Workday**, **Eightfold.ai**, **Greenhouse**, **iCIMS**, **Rippling**, **Ashby**, **Lever**, **Google**, **Meta**, **Apple**, and **Amazon**.
+A high-performance command-line careers crawler, data normalizer, and interactive dashboard that fetches real-time job openings from corporate career portals across **Workday**, **Eightfold.ai**, **Greenhouse**, **iCIMS**, **Oracle Cloud HCM**, **SAP SuccessFactors**, **Jobvite**, **Attrax**, **Rippling**, **Ashby**, **Lever**, **Google**, **Meta**, **Apple**, **Amazon**, **MediaTek**, and **Realtek**.
 
 Includes an interactive web dashboard with multi-location filters, instant role searching, table merging, and a built-in application tracking system to mark and track applied jobs.
 
@@ -8,8 +8,8 @@ Includes an interactive web dashboard with multi-location filters, instant role 
 
 ## Features
 
-- **Multi-ATS Support**: Directly interfaces with candidate APIs across 11 major ATS platforms and career portals without headless browsers.
-- **50+ Pre-Configured Companies**: Tech giants (Google, Microsoft, Meta, Apple, Amazon), semiconductor leaders, and AI hardware innovators pre-configured out of the box.
+- **Multi-ATS Support**: Directly interfaces with candidate APIs across 17 major ATS platforms and career portals without headless browsers.
+- **50+ Pre-Configured Companies**: Tech giants (Google, Microsoft, Meta, Apple, Amazon, Cisco), semiconductor leaders, and AI hardware innovators pre-configured out of the box.
 - **Smart Location Normalization**: Tech-hub normalization for Indian centers (Bengaluru, Hyderabad, Pune, Noida, Gurgaon, Chennai) and global sites.
 - **Interactive Web Dashboard**: Auto-generated standalone HTML report (`job_data/index.html`) with zero CDN dependencies.
 - **Merge All Tables View**: One-click toggle to merge all company tables into a unified view for sorting newest jobs across all companies.
@@ -31,17 +31,23 @@ Includes an interactive web dashboard with multi-location filters, instant role 
 | **Meta** | Relay GraphQL Candidate Portal API (`CareersJobSearchResultsV2DataQuery`) | Meta |
 | **Apple** | Apple Jobs REST API with CSRF Token Authentication | Apple |
 | **Amazon** | Amazon Jobs Search API (`search.json` with Software Development filtering) | Amazon |
-| **Workday** | Candidate Experience Site (CXS) REST API | NVIDIA, Intel, Broadcom, Marvell, SiFive, KLA, Silicon Labs, Wolfspeed, Cadence, Analog Devices |
+| **Workday** | Candidate Experience Site (CXS) REST API | Cisco, NVIDIA, Intel, Broadcom, Marvell, SiFive, KLA, Silicon Labs, Wolfspeed, Cadence, Analog Devices |
 | **Eightfold.ai** | Talent Intelligence PCSX & Career APIs | Qualcomm, Micron Technology, Infineon, Applied Materials, Lam Research, STMicroelectronics, Autodesk, GlobalFoundries |
 | **Greenhouse** | Public Job Board REST API | Astera Labs, Tenstorrent, SambaNova Systems, Graphcore, Baya Systems, Lightmatter, Etched |
-| **iCIMS** | Jibe & TalentBrew Candidate APIs | ARM, AMD, Keysight Technologies |
+| **iCIMS** | Jibe, TalentBrew & Standard HTML Candidate Portals | ARM, AMD, Keysight Technologies, Rambus |
 | **Rippling** | Public Board & Job Detail API | TYLsemi |
 | **Ashby** | AshbyHQ Posting API | Cerebras Systems, d-Matrix |
 | **Lever** | Lever Postings JSON API | Nuvacore, Eliyan |
+| **Oracle Cloud HCM** | Fusion Candidate Experience REST API | Texas Instruments, Onsemi |
+| **SAP SuccessFactors** | Recruiting Job Search API (CSRF + JSESSIONID) | Skyworks Solutions |
+| **Jobvite** | Direct Career Board & JSON-LD Metadata | SiMa.ai |
+| **Attrax** | Paginated Career Search & JSON-LD Metadata | Renesas Electronics |
+| **MediaTek Careers** | tRPC Candidate Job API (`superjson`) | MediaTek |
+| **Realtek Careers** | Realtek Recruit JSON API | Realtek |
 
 ---
 
-## Pre-Configured Companies (50 Companies)
+## Pre-Configured Companies (59 Companies)
 
 <details>
 <summary><strong>Click to view the full directory of pre-configured companies</strong></summary>
@@ -60,6 +66,7 @@ Includes an interactive web dashboard with multi-location filters, instant role 
 | **Intel** | Workday | Semiconductor / Processors | Bengaluru, Hyderabad |
 | **Qualcomm** | Eightfold.ai | Semiconductor / Wireless SoC | Bengaluru, Hyderabad, Chennai, Noida |
 | **Broadcom** | Workday | Semiconductor / Networking & Storage | Bengaluru, Pune, Hyderabad |
+| **Cisco** | Workday | Tech / Networking, Silicon One & Cloud | Bengaluru, Chennai, Gurgaon, Hyderabad, Pune |
 | **Marvell** | Workday | Semiconductor / Data Infrastructure | Bengaluru, Pune, Hyderabad |
 | **SiFive** | Workday | Semiconductor / RISC-V Compute | Bengaluru, Hyderabad |
 | **KLA Corporation** | Workday | Semiconductor / Metrology & Yield | Chennai |
@@ -98,6 +105,14 @@ Includes an interactive web dashboard with multi-location filters, instant role 
 | **Semtech** | Workday | Semiconductor / Analog & Mixed-Signal | Bengaluru, Pune |
 | **Workday** | Workday | Cloud / Enterprise | Pune |
 | **Procter & Gamble** | Workday | Consumer Goods / Tech | Hyderabad |
+| **Texas Instruments** | Oracle Cloud HCM | Semiconductor / Analog & Embedded | Bengaluru, India |
+| **Onsemi** | Oracle Cloud HCM | Semiconductor / Power & Sensing | Bengaluru |
+| **Skyworks Solutions** | SAP SuccessFactors | Semiconductor / Analog & RF | Bengaluru |
+| **SiMa.ai** | Jobvite | Semiconductor / Edge AI SoC | Bengaluru |
+| **Rambus** | iCIMS | Semiconductor / Memory & Interface IP | Bengaluru |
+| **Renesas Electronics** | Attrax | Semiconductor / MCU, SoC & Power | Bengaluru |
+| **MediaTek** | MediaTek Careers | Semiconductor / Mobile & Connectivity SoC | Bengaluru |
+| **Realtek** | Realtek Careers | Semiconductor / Networking & Connectivity | India & Taiwan (`--no-location`) |
 
 </details>
 
@@ -140,13 +155,13 @@ Includes an interactive web dashboard with multi-location filters, instant role 
 ## How to Fetch Jobs
 
 ### 1. Fetch All Available Jobs (Default India Filter)
-Fetches open positions across all 46 configured companies for India locations:
+Fetches open positions across all 59 configured companies for India locations:
 ```bash
 python cli.py fetch
 ```
 
 ### 2. Fetch All Available Jobs Globally (No Location Filter)
-Fetches all open positions worldwide from all 46 companies:
+Fetches all open positions worldwide from all 59 companies:
 ```bash
 python cli.py fetch --no-location
 ```
@@ -177,6 +192,12 @@ python cli.py fetch --ats workday
 python cli.py fetch --ats greenhouse
 python cli.py fetch --ats eightfold
 python cli.py fetch --ats icims
+python cli.py fetch --ats oracle_hcm
+python cli.py fetch --ats successfactors
+python cli.py fetch --ats jobvite
+python cli.py fetch --ats attrax
+python cli.py fetch --ats mediatek
+python cli.py fetch --ats realtek
 python cli.py fetch --ats ashby
 python cli.py fetch --ats lever
 python cli.py fetch --ats rippling
@@ -268,7 +289,7 @@ python cli.py companies
 ```bash
 python cli.py add-company
 ```
-Follow the interactive prompt to configure any company on Workday, Eightfold, Greenhouse, iCIMS, Rippling, Ashby, or Lever. The company will be saved to `companies.json`.
+Follow the interactive prompt to configure any company on Workday, Eightfold, Greenhouse, iCIMS, Oracle Cloud HCM, SAP SuccessFactors, Jobvite, Attrax, Rippling, Ashby, Lever, MediaTek, or Realtek. The company will be saved to `companies.json`.
 
 ---
 
@@ -294,7 +315,13 @@ JobFinder/
 │   ├── workday.py                 # Workday CXS API client
 │   ├── eightfold.py               # Eightfold.ai PCSX and Career API client
 │   ├── greenhouse.py              # Greenhouse public job board client
-│   ├── icims.py                   # iCIMS, Jibe, and TalentBrew client
+│   ├── icims.py                   # iCIMS, Jibe, TalentBrew & standard iCIMS HTML client
+│   ├── oracle_hcm.py              # Oracle Cloud HCM Candidate Experience client
+│   ├── successfactors.py          # SAP SuccessFactors Recruiting client
+│   ├── jobvite.py                 # Jobvite career board client
+│   ├── attrax.py                  # Attrax career site client
+│   ├── mediatek.py                # MediaTek tRPC careers client
+│   ├── realtek.py                 # Realtek Recruit portal client
 │   ├── rippling.py                # Rippling ATS client
 │   ├── ashby.py                   # AshbyHQ job board client
 │   ├── lever.py                   # Lever postings client

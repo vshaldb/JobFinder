@@ -168,7 +168,11 @@ def cli() -> None:
     "--ats", "-a",
     default="all",
     show_default=True,
-    help="Filter by ATS provider ('all', 'workday', 'eightfold', 'greenhouse', 'icims', 'rippling', 'ashby', 'lever', 'google', 'meta', 'apple', 'amazon').",
+    help=(
+        "Filter by ATS provider ('all', 'workday', 'eightfold', 'greenhouse', 'icims', "
+        "'rippling', 'ashby', 'lever', 'oracle_hcm', 'successfactors', 'jobvite', "
+        "'attrax', 'google', 'meta', 'apple', 'amazon', 'mediatek', 'realtek')."
+    ),
 )
 @click.option(
     "--domain", "-D",
@@ -470,7 +474,11 @@ def fetch(
     "--ats", "-a",
     default="all",
     show_default=True,
-    help="Filter by ATS provider ('all', 'workday', 'eightfold', 'greenhouse', 'icims', 'rippling', 'ashby', 'lever', 'google', 'meta', 'apple', 'amazon').",
+    help=(
+        "Filter by ATS provider ('all', 'workday', 'eightfold', 'greenhouse', 'icims', "
+        "'rippling', 'ashby', 'lever', 'oracle_hcm', 'successfactors', 'jobvite', "
+        "'attrax', 'google', 'meta', 'apple', 'amazon', 'mediatek', 'realtek')."
+    ),
 )
 @click.option(
     "--domain", "-D",
@@ -532,6 +540,18 @@ def companies_cmd(
             target = f"jobs.apple.com ({c.get('locale', 'en-in')})"
         elif c_ats == "amazon":
             target = f"amazon.jobs ({c.get('category', 'software-development')})"
+        elif c_ats in ("oracle_hcm", "oracle"):
+            target = f"{c.get('host', '')} ({c.get('site_name') or c.get('site_number', 'CX')})"
+        elif c_ats == "successfactors":
+            target = c.get("career_site_url", "")
+        elif c_ats == "jobvite":
+            target = f"jobs.jobvite.com/{c.get('board_slug', '')}"
+        elif c_ats == "attrax":
+            target = c.get("career_site_url", "")
+        elif c_ats == "mediatek":
+            target = "careers.mediatek.com"
+        elif c_ats == "realtek":
+            target = "recruit.realtek.com"
         else:
             target = c.get("tenant", "")
 
@@ -566,20 +586,28 @@ def companies_cmd(
     help="Path to the companies.json file to update.",
 )
 def add_company(companies_file: Optional[Path]) -> None:
-    """Interactively add a new company to the config (Workday, Eightfold, or Greenhouse)."""
+    """Interactively add a new company to the config."""
     from jobfinder.config import DEFAULT_CONFIG_PATH
 
     config_path = companies_file or DEFAULT_CONFIG_PATH
 
     console.print(
         "\n[bold cyan]Add a new Company to JobFinder[/bold cyan]\n"
-        "Supported platforms: [green]workday[/green] | [green]eightfold[/green] | [green]greenhouse[/green] | [green]icims[/green] | [green]rippling[/green] | [green]ashby[/green] | [green]lever[/green]\n"
+        "Supported platforms: [green]workday[/green] | [green]eightfold[/green] | [green]greenhouse[/green] | "
+        "[green]icims[/green] | [green]rippling[/green] | [green]ashby[/green] | [green]lever[/green] | "
+        "[green]oracle_hcm[/green] | [green]successfactors[/green] | [green]jobvite[/green] | [green]attrax[/green]\n"
     )
 
     name = click.prompt("Company name", type=str)
     ats_type = click.prompt(
         "ATS Provider",
-        type=click.Choice(["workday", "eightfold", "greenhouse", "icims", "rippling", "ashby", "lever"], case_sensitive=False),
+        type=click.Choice(
+            [
+                "workday", "eightfold", "greenhouse", "icims", "rippling",
+                "ashby", "lever", "oracle_hcm", "successfactors", "jobvite", "attrax",
+            ],
+            case_sensitive=False,
+        ),
         default="workday",
     ).lower()
 
@@ -644,6 +672,36 @@ def add_company(companies_file: Optional[Path]) -> None:
         new_entry.update({
             "site_name": site_name.strip(),
             "career_site_url": f"https://jobs.lever.co/{site_name.strip()}",
+        })
+    elif ats_type == "oracle_hcm":
+        host = click.prompt("Oracle Cloud host (e.g. edbz.fa.us2.oraclecloud.com)", type=str)
+        site_number = click.prompt("Oracle site number (e.g. CX, CX_1001)", default="CX", type=str)
+        career_site_url = click.prompt(
+            "Career site URL",
+            default=f"https://{host.strip()}/hcmUI/CandidateExperience/en/sites/{site_number.strip()}",
+            type=str,
+        )
+        new_entry.update({
+            "host": host.strip(),
+            "site_number": site_number.strip(),
+            "career_site_url": career_site_url.strip(),
+        })
+    elif ats_type == "successfactors":
+        career_site_url = click.prompt("SuccessFactors portal URL (e.g. https://careers.skyworksinc.com)", type=str)
+        new_entry.update({
+            "career_site_url": career_site_url.strip(),
+            "locale": "en_US",
+        })
+    elif ats_type == "jobvite":
+        board_slug = click.prompt("Jobvite board slug (e.g. simaai)", type=str)
+        new_entry.update({
+            "board_slug": board_slug.strip(),
+            "career_site_url": f"https://jobs.jobvite.com/{board_slug.strip()}",
+        })
+    elif ats_type == "attrax":
+        career_site_url = click.prompt("Attrax portal URL (e.g. https://jobs.renesas.com)", type=str)
+        new_entry.update({
+            "career_site_url": career_site_url.strip(),
         })
 
     enabled = click.confirm("Enable this company?", default=True)

@@ -74,6 +74,36 @@ def get_location_tags(location: str) -> List[str]:
     return tags
 
 
+ATS_BADGE_MAP = (
+    ("workday", "badge-ats-workday"),
+    ("eightfold", "badge-ats-eightfold"),
+    ("greenhouse", "badge-ats-greenhouse"),
+    ("icims", "badge-ats-icims"),
+    ("rippling", "badge-ats-rippling"),
+    ("ashby", "badge-ats-ashby"),
+    ("lever", "badge-ats-lever"),
+    ("google", "badge-ats-google"),
+    ("meta", "badge-ats-meta"),
+    ("apple", "badge-ats-apple"),
+    ("amazon", "badge-ats-amazon"),
+    ("oracle", "badge-ats-oracle"),
+    ("successfactors", "badge-ats-successfactors"),
+    ("jobvite", "badge-ats-jobvite"),
+    ("attrax", "badge-ats-attrax"),
+    ("mediatek", "badge-ats-mediatek"),
+    ("realtek", "badge-ats-realtek"),
+)
+
+
+def get_ats_badge_class(ats: str) -> str:
+    """Return CSS badge class matching an ATS provider name."""
+    ats_lower = (ats or "").lower()
+    for key, badge_class in ATS_BADGE_MAP:
+        if key in ats_lower:
+            return badge_class
+    return "badge-ats-default"
+
+
 def render_apply_cell(
     url: str,
     title: str,
@@ -161,31 +191,7 @@ def build_merged_section(
             comp_name = job["company"]
             slug = job["slug"]
             ats = job.get("ats", "Careers")
-            ats_lower = ats.lower()
-            if "workday" in ats_lower:
-                badge_class = "badge-ats-workday"
-            elif "eightfold" in ats_lower:
-                badge_class = "badge-ats-eightfold"
-            elif "greenhouse" in ats_lower:
-                badge_class = "badge-ats-greenhouse"
-            elif "icims" in ats_lower:
-                badge_class = "badge-ats-icims"
-            elif "rippling" in ats_lower:
-                badge_class = "badge-ats-rippling"
-            elif "ashby" in ats_lower:
-                badge_class = "badge-ats-ashby"
-            elif "lever" in ats_lower:
-                badge_class = "badge-ats-lever"
-            elif "google" in ats_lower:
-                badge_class = "badge-ats-google"
-            elif "meta" in ats_lower:
-                badge_class = "badge-ats-meta"
-            elif "apple" in ats_lower:
-                badge_class = "badge-ats-apple"
-            elif "amazon" in ats_lower:
-                badge_class = "badge-ats-amazon"
-            else:
-                badge_class = "badge-ats-default"
+            badge_class = get_ats_badge_class(ats)
 
             title = job.get("title", "Untitled Position")
             job_id = job.get("job_id", "N/A")
@@ -443,33 +449,7 @@ def generate_html_report(
         jobs = r.get("jobs", [])
         job_count = len(jobs)
         ats = r.get("ats") or (jobs[0].get("source_ats") if jobs else "Careers") or "Careers"
-        ats_lower = ats.lower()
-
-        # ATS badge class
-        if "workday" in ats_lower:
-            badge_class = "badge-ats-workday"
-        elif "eightfold" in ats_lower:
-            badge_class = "badge-ats-eightfold"
-        elif "greenhouse" in ats_lower:
-            badge_class = "badge-ats-greenhouse"
-        elif "icims" in ats_lower:
-            badge_class = "badge-ats-icims"
-        elif "rippling" in ats_lower:
-            badge_class = "badge-ats-rippling"
-        elif "ashby" in ats_lower:
-            badge_class = "badge-ats-ashby"
-        elif "lever" in ats_lower:
-            badge_class = "badge-ats-lever"
-        elif "google" in ats_lower:
-            badge_class = "badge-ats-google"
-        elif "meta" in ats_lower:
-            badge_class = "badge-ats-meta"
-        elif "apple" in ats_lower:
-            badge_class = "badge-ats-apple"
-        elif "amazon" in ats_lower:
-            badge_class = "badge-ats-amazon"
-        else:
-            badge_class = "badge-ats-default"
+        badge_class = get_ats_badge_class(ats)
 
         # Build table rows
         rows_html: List[str] = []

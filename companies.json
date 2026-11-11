@@ -118,6 +118,37 @@
     "domain": "semiconductor"
   },
   {
+    "name": "Cisco",
+    "ats": "workday",
+    "tenant": "cisco",
+    "datacenter": "wd5",
+    "site_name": "Cisco_Careers",
+    "skip_country_filter": true,
+    "default_locations": [
+      "662e524adea41001f4d0bd5a1ddd0000",
+      "3dbd26f9e73e1001f4d59df763f20000",
+      "026fa05becb01001f506953e0df00000",
+      "ef8a5a22403d1001f4fde228ba110000",
+      "6bed8334bf4b1001f5010f5b49d30000",
+      "6bed8334bf4b1001f4f15a1f787a0000",
+      "8676de3331b41001f4f96625fdde0000",
+      "8676de3331b41001f4eaac80a6280000"
+    ],
+    "default_location_names": [
+      "Bangalore, India",
+      "Chennai, India",
+      "Gurgaon, India",
+      "Hyderabad, India",
+      "Kolkata, India",
+      "Mumbai, India",
+      "New Delhi, India",
+      "Pune, India"
+    ],
+    "career_site_url": "https://cisco.wd5.myworkdayjobs.com/Cisco_Careers",
+    "enabled": true,
+    "domain": "tech"
+  },
+  {
     "name": "Marvell",
     "ats": "workday",
     "tenant": "marvell",
@@ -462,6 +493,72 @@
     "ats": "lever",
     "site_name": "eliyan",
     "career_site_url": "https://jobs.lever.co/eliyan",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Texas Instruments",
+    "ats": "oracle_hcm",
+    "host": "edbz.fa.us2.oraclecloud.com",
+    "site_number": "CX",
+    "job_url_prefix": "https://careers.ti.com/en/sites/CX/job/",
+    "career_site_url": "https://careers.ti.com/en/sites/CX",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Onsemi",
+    "ats": "oracle_hcm",
+    "host": "hctz.fa.us2.oraclecloud.com",
+    "site_number": "CX_1001",
+    "job_url_prefix": "https://hctz.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/job/",
+    "career_site_url": "https://hctz.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Skyworks Solutions",
+    "ats": "successfactors",
+    "career_site_url": "https://careers.skyworksinc.com",
+    "locale": "en_US",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "SiMa.ai",
+    "ats": "jobvite",
+    "board_slug": "simaai",
+    "career_site_url": "https://jobs.jobvite.com/simaai",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Rambus",
+    "ats": "icims",
+    "portal_type": "standard",
+    "subdomain": "careers-rambus",
+    "career_site_url": "https://careers-rambus.icims.com/jobs/search",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Renesas Electronics",
+    "ats": "attrax",
+    "career_site_url": "https://jobs.renesas.com",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "MediaTek",
+    "ats": "mediatek",
+    "career_site_url": "https://careers.mediatek.com/en/jobs",
+    "enabled": true,
+    "domain": "semiconductor"
+  },
+  {
+    "name": "Realtek",
+    "ats": "realtek",
+    "career_site_url": "https://recruit.realtek.com/Job/Search?lang=en-GB",
     "enabled": true,
     "domain": "semiconductor"
   }
